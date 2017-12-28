@@ -13,6 +13,7 @@ Author URI: http://www.gonzalotorreras.com
     include_once(plugin_dir_path(__FILE__) .'/admin.php');
     include_once(plugin_dir_path(__FILE__) .'/inc/functions.php');
     include_once(plugin_dir_path(__FILE__) .'/inc/shortcodes.php');
+    include_once(plugin_dir_path(__FILE__) .'/inc/widgets/GTSimpleVoteMeBaseWidget.php');
     include_once(plugin_dir_path(__FILE__) .'/inc/widgets/GTSimpleVoteMeTopVotedWidget.php');
     include_once(plugin_dir_path(__FILE__) .'/inc/widgets/GTSimpleVoteMeWidget.php');
 

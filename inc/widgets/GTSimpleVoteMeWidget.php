@@ -5,13 +5,13 @@
  * Date: 28/12/17
  * Time: 11:17 AM
  */
-class GTSimpleVoteMeWidget extends WP_Widget {
+class GTSimpleVoteMeWidget extends GTSimpleVoteMeBaseWidget {
 
-    public function __construct()
+    public function __construct($id_base, $name, array $widget_options = array(), array $control_options = array())
     {
 
         parent::__construct(
-            'chilean-financial-indicators', //ID
+            'Widget', //ID
             'Simple Vote me Widget', //Nombre
             array(
                 'classname'   => 'GTSimpleVoteMeWidget',

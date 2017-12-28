@@ -6,13 +6,13 @@
  * Time: 11:16 AM
  */
 //widget Ranking
-class GTSimpleVoteMeTopVotedWidget extends WP_Widget {
+class GTSimpleVoteMeTopVotedWidget extends GTSimpleVoteMeBaseWidget {
 
-    public function __construct()
+    public function __construct($id_base, $name, array $widget_options = array(), array $control_options = array())
     {
 
         parent::__construct(
-            'GTSimpleVoteMeTopVotedWidget', //ID
+            'TopVotedWidget', //ID
             'Ranking Simple Vote me', //Nombre
             array(
                 'classname'   => 'GTSimpleVoteMeTopVotedWidget',
