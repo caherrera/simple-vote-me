@@ -133,7 +133,7 @@
                           $types = get_post_types(array('public'=>true),'objects');
                     foreach ($types as $type){?>
                         <div>
-                        <input type="checkbox" id="<?php echo $type->name; ?>" name="gt_simplevoteme_custom_post_types[]" value="<?php echo $type->name; ?>" <?php if(in_array($type->name,$typesActive)) echo 'checked';?>/>
+                        <input type="checkbox" id="<?php echo $type->name; ?>" name="gt_simplevoteme_custom_post_types[]" value="<?php echo $type->name; ?>" <?php if(in_array($type->name,(array)$typesActive)) echo 'checked';?>/>
                         <label for="<?php echo $type->name; ?>"><?php echo $type->labels->menu_name; ?></label>
                         <?php //print_r($type); ?>
                         </div>
