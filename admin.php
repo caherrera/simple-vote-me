@@ -509,3 +509,4 @@ function gt_simplevoteme_add_meta_box_votes(){
 }
  
 add_action("add_meta_boxes", "gt_simplevoteme_add_meta_box_votes");
+
