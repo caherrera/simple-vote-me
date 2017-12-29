@@ -2,14 +2,16 @@
 
 function gt_simplevoteme_admin_scripts()
 {
-    wp_enqueue_script('media-upload');
-    wp_enqueue_script('thickbox');
-    wp_enqueue_script('jquery');
+
+        if (!wp_script_is('media-upload')) {wp_enqueue_script('media-upload');}
+        if (!wp_script_is('thickbox')) {wp_enqueue_script('thickbox');}
+        if (!wp_script_is('jquery')) {wp_enqueue_script('jquery');}
+
 }
 
 function gt_simplevoteme_admin_styles()
 {
-    wp_enqueue_style('thickbox');
+    if (!wp_style_is('thickbox')) {wp_enqueue_style('thickbox');}
 }
 
 add_action('admin_print_scripts', 'gt_simplevoteme_admin_scripts');
