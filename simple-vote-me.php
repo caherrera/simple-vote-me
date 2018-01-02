@@ -110,7 +110,7 @@ function gt_simplevoteme_check_bp_compliments_activate()
             $table = BP_COMPLIMENTS_TABLE . "_meta";
             update_option('gt_simplevoteme_bp_compliments_table', $table);
         }
-        $exist = dbDelta("show tables like '$table';");
+        $exist = $wpdb->get_results("show tables like '$table';",true);
         if ( ! $exist) {
             $sql = "CREATE TABLE `$table` (";
             $sql .= "`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,";
