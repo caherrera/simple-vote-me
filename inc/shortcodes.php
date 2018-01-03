@@ -32,7 +32,9 @@ function gt_shortcode_simplevoteme($atributos)
 function gt_shortcode_simplevoteme_compliments($atributos)
 {
     $atts = shortcode_atts(array(
-        'type' => 'h',
+        'type'          => 'h',
+        'compliment_id' => false,
+        'user_id'       => false,
     ), $atributos);
 
 
@@ -43,7 +45,7 @@ function gt_shortcode_simplevoteme_compliments($atributos)
     }
 
 
-    $voteme = gt_simplevoteme_getvotelink(0, $atts["type"]);
+    $voteme = gt_simplevoteme_compliment_getvotelink(0,$atts['compliment_id'], $atts["type"]);
 
     ob_start();
     echo $voteme;

@@ -13,6 +13,7 @@ define('SIMPLEVOTEMESURL', WP_PLUGIN_URL . "/" . dirname(plugin_basename(__FILE_
 include_once(plugin_dir_path(__FILE__) . '/admin.php');
 //    include_once(plugin_dir_path(__FILE__) .'/inc/functions.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/shortcodes.php');
+include_once(plugin_dir_path(__FILE__) . '/inc/bp-compliments.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/widgets/GTSimpleVoteMeBaseWidget.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/widgets/GTSimpleVoteMeTopVotedWidget.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/widgets/GTSimpleVoteMeWidget.php');
@@ -53,7 +54,15 @@ function gt_simplevoteme_checkversion()
 
 }
 
+function gt_simplevoteme_registermeta()
+{
+    global $wpdb;
+    $meta_table        = BP_COMPLIMENT_META_TYPE . 'meta';
+    $wpdb->$meta_table = $wpdb->prefix . $meta_table;
+}
+
 add_action('plugins_loaded', 'gt_simplevoteme_checkversion');
+add_action('plugins_loaded', 'gt_simplevoteme_registermeta');
 
 
 function gt_simplevoteme_check_old_votes()
@@ -106,19 +115,17 @@ function gt_simplevoteme_check_bp_compliments_activate()
 
     if (defined('BP_COMPLIMENTS_TABLE')) {
         $charset_collate = ! empty($wpdb->charset) ? "DEFAULT CHARACTER SET $wpdb->charset" : '';
-        if ( ! $table = get_option('gt_simplevoteme_bp_compliments_table')) {
-            $table = BP_COMPLIMENTS_TABLE . "_meta";
-            update_option('gt_simplevoteme_bp_compliments_table', $table);
-        }
-        $exist = $wpdb->get_results("show tables like '$table';",true);
+        $table           = BP_COMPLIMENTS_TABLE . "meta";
+        update_option('gt_simplevoteme_bp_compliments_table', $table);
+        $exist = $wpdb->get_results("show tables like '$table';", true);
         if ( ! $exist) {
             $sql = "CREATE TABLE `$table` (";
             $sql .= "`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,";
-            $sql .= "`compliment_id` bigint(20) unsigned NOT NULL DEFAULT '0',";
+            $sql .= "`bp_compliments_id` bigint(20) unsigned NOT NULL DEFAULT '0',";
             $sql .= "`meta_key` varchar(255) DEFAULT NULL,";
             $sql .= "`meta_value` longtext,";
             $sql .= "PRIMARY KEY (`meta_id`),";
-            $sql .= "KEY `compliment_id` (`compliment_id`),";
+            $sql .= "KEY `bp_compliments_id` (`bp_compliments_id`),";
             $sql .= "KEY `meta_key` (`meta_key`(191))";
             $sql .= ") ENGINE=InnoDB {$charset_collate}";
 
@@ -299,24 +306,7 @@ function gt_simplevoteme_getvotelink($noLinks = false, $tipo = 'h')
 
     $result = $votemelink;
 
-    $css = get_option('gt_simplevoteme_custom_css');
 
-    if ($css) {
-        $result .= "<style>" . $css . "</style>";
-    }
-
-    $bor_G = get_option('gt_simplevoteme_custom_border_good');
-    $bor_N = get_option('gt_simplevoteme_custom_border_neutral');
-    $bor_B = get_option('gt_simplevoteme_custom_border_bad');
-    $bg_B  = get_option('gt_simplevoteme_custom_background_bad');
-    $bg_N  = get_option('gt_simplevoteme_custom_background_neutral');
-    $bg_G  = get_option('gt_simplevoteme_custom_background_good');
-
-    if ($bor_G || $bor_N || $bor_B || $bg_G || $bg_N || $bg_B) {
-        $result .= "<style>.simplevotemeWrapper span.bad{  background: rgba($bg_B);border:1px solid rgba($bor_B);.simplevotemeWrapper span.neutro{  background: rgba($bg_N);border:1px solid rgba($bor_N);.simplevotemeWrapper span.good{  background: rgba($bg_G);border:1px solid rgba($bor_G);}</style>";
-    }
-
-    //$result .= print_r($votes);
     return $result;
 }
 
