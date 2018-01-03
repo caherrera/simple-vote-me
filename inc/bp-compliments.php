@@ -288,7 +288,7 @@ function get_compliment_votes($compliment_id = false)
 
 function gt_simplevoteme_compliment_getimgvote($type)
 {
-    $custom    = get_option('gt_simplevoteme_compliment_custom_img');
+    $custom    = get_option('gt_simplevoteme_custom_img');
     $customImg = get_option("gt_simplevoteme_compliment_custom_img_$type");
 
     if ( ! $custom || ($custom && ! $customImg)) {

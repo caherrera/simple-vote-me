@@ -3,7 +3,7 @@
 function gt_simplevoteme_admin_scripts()
 {
     wp_enqueue_media();
-    wp_enqueue_script( 'wp-media-uploader', SIMPLEVOTEMESURL . '/js/wp_media_uploader.js', array( 'jquery' ), 1.0 );
+    wp_enqueue_script('wp-media-uploader', SIMPLEVOTEMESURL . '/js/wp_media_uploader.js', array('jquery'), 1.0);
 }
 
 function gt_simplevoteme_admin_styles()
@@ -49,7 +49,8 @@ function gt_simplevoteme_admin_style()
 
 function gt_get_tr_custom_img($vote, $prefix = '')
 {
-    $title      = __('Custom image for ' . ucwords($prefix?str_ireplace('_', '', $prefix) . ' ':'') . ucwords($vote));
+    $title      = __('Custom image for ' . ucwords($prefix ? str_ireplace('_', '',
+                $prefix) . ' ' : '') . ucwords($vote));
     $customImg  = get_option("gt_simplevoteme_{$prefix}custom_img_" . $vote) ?: '';
     $tagName    = "gt_simplevoteme_{$prefix}custom_img_$vote";
     $imgTagName = "gt_simplevoteme_{$prefix}custom_thumb_$vote";
@@ -70,35 +71,18 @@ function gt_get_tr_custom_img($vote, $prefix = '')
 //page admin
 function gt_simplevoteme_page_admin()
 {
-    global $blog_id;
     if (isset($_POST['submit'])) {
-        update_option('gt_simplevoteme_title', $_POST['gt_simplevoteme_title']);
-        update_option('gt_simplevoteme_auto_insert_content', $_POST['gt_simplevoteme_auto_insert_content']);
-        update_option('gt_simplevoteme_auto_insert_home', $_POST['gt_simplevoteme_auto_insert_home']);
-        update_option('gt_simplevoteme_position', $_POST['gt_simplevoteme_position']);
-        update_option('gt_simplevoteme_only_login', $_POST['gt_simplevoteme_only_login']);
-        update_option('gt_simplevoteme_default_css', $_POST['gt_simplevoteme_default_css']);
-        update_option('gt_simplevoteme_custom_css', $_POST['gt_simplevoteme_custom_css']);
-        update_option('gt_simplevoteme_results', $_POST['gt_simplevoteme_results']);
-        update_option('gt_simplevoteme_results_type', $_POST['gt_simplevoteme_results_type']);
-        update_option('gt_simplevoteme_custom_img', $_POST['gt_simplevoteme_custom_img']);
-        update_option('gt_simplevoteme_custom_border_good', $_POST['gt_simplevoteme_custom_border_good']);
-        update_option('gt_simplevoteme_custom_img_good', $_POST['gt_simplevoteme_custom_img_good']);
-        update_option('gt_simplevoteme_custom_border_neutral', $_POST['gt_simplevoteme_custom_border_neutral']);
-        update_option('gt_simplevoteme_custom_img_neutral', $_POST['gt_simplevoteme_custom_img_neutral']);
-        update_option('gt_simplevoteme_custom_border_bad', $_POST['gt_simplevoteme_custom_border_bad']);
-        update_option('gt_simplevoteme_custom_img_bad', $_POST['gt_simplevoteme_custom_img_bad']);
-        update_option('gt_simplevoteme_votes', $_POST['gt_simplevoteme_votes']);
-        update_option('gt_simplevoteme_custom_post_types', $_POST['gt_simplevoteme_custom_post_types']);
-
-        update_option('gt_simplevoteme_compliment_custom_img', $_POST['gt_simplevoteme_compliment_custom_img']);
-        update_option('gt_simplevoteme_compliment_custom_img_good',
-            $_POST['gt_simplevoteme_compliment_custom_img_good']);
-        update_option('gt_simplevoteme_compliment_custom_img_neutral',
-            $_POST['gt_simplevoteme_compliment_custom_img_neutral']);
-        update_option('gt_simplevoteme_compliment_custom_img_bad', $_POST['gt_simplevoteme_compliment_custom_img_bad']);
-
         if ($_POST['gt_simplevoteme_reset']) {
+            $gt_simplevoteme_reset = true;
+            unset($_POST['gt_simplevoteme_reset']);
+        }
+        foreach ($_POST as $item) {
+            if (preg_match('/gt_simplevoteme_.*/', $item)) {
+                update_option($item, $_POST[$item]);
+            }
+        }
+
+        if ($gt_simplevoteme_reset) {
             gt_simplevoteme_reset(1);
         }
     }
@@ -286,26 +270,27 @@ function gt_simplevoteme_page_admin()
                         } ?> />
                     </td>
                 </tr>
-                <tr>
-                    <th scope="row"><?php echo __('Custom Images'); ?></th>
-                    <td>
-                        <?php $customImg = get_option('gt_simplevoteme_custom_img'); ?>
-                        <select name="gt_simplevoteme_custom_img">
-                            <option value="0" <?php if ( ! $customImg) {
-                                echo "selected";
-                            } ?>><?php echo __('No'); ?></option>
-                            <option value="1" <?php if ($customImg) {
-                                echo "selected";
-                            } ?>><?php echo __('Yes'); ?></option>
-                        </select>
-                    </td>
-                </tr>
+
                 <?php echo gt_get_tr_custom_img('good'); ?>
                 <?php echo gt_get_tr_custom_img('neutral'); ?>
                 <?php echo gt_get_tr_custom_img('bad'); ?>
                 <?php echo gt_get_tr_custom_img('good', 'compliment_'); ?>
                 <?php echo gt_get_tr_custom_img('neutral', 'compliment_'); ?>
                 <?php echo gt_get_tr_custom_img('bad', 'compliment_'); ?>
+                <tr>
+                    <th scope="row"><?php echo __('Extra Class'); ?></th>
+                    <td>
+                        <input id="extra_class" name="gt_simplevoteme_extra_class"
+                               value="<?php get_option('gt_simplevoteme_extra_class'); ?>">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><?php echo __('Extra Class for Compliments'); ?></th>
+                    <td>
+                        <input id="extra_class_compliment" name="gt_simplevoteme_extra_class_compliment"
+                               value="<?php get_option('gt_simplevoteme_extra_class_compliment'); ?>">
+                    </td>
+                </tr>
                 <tr>
                     <th scope="row"><?php echo __('Reset all votes?'); ?></th>
                     <td>
@@ -318,28 +303,28 @@ function gt_simplevoteme_page_admin()
             </table>
             <?php submit_button(); ?>
         </form>
-<script>
-    jQuery(document).ready(function(e){
-        jQuery.wpMediaUploader({
+        <script>
+            jQuery(document).ready(function (e) {
+                jQuery.wpMediaUploader({
 
-            target : '.gt_simplevoteme_custom_img_uploader', // The class wrapping the textbox
-            uploaderTitle : 'Select or upload image', // The title of the media upload popup
-            uploaderButton : 'Set image', // the text of the button in the media upload popup
-            multiple : false, // Allow the user to select multiple images
-            buttonText : 'Upload image', // The text of the upload button
-            buttonClass : '.gt_simplevoteme_custom_img_link', // the class of the upload button
-            previewSize : '150px', // The preview image size
-            modal : false, // is the upload button within a bootstrap modal ?
-            buttonStyle : { // style the button
-                color : '#3bafda',
-                background : '#fff',
-                fontSize : '16px',
-                padding : '10px 15px',
-            },
+                    target: '.gt_simplevoteme_custom_img_uploader', // The class wrapping the textbox
+                    uploaderTitle: 'Select or upload image', // The title of the media upload popup
+                    uploaderButton: 'Set image', // the text of the button in the media upload popup
+                    multiple: false, // Allow the user to select multiple images
+                    buttonText: 'Upload image', // The text of the upload button
+                    buttonClass: '.gt_simplevoteme_custom_img_link', // the class of the upload button
+                    previewSize: '150px', // The preview image size
+                    modal: false, // is the upload button within a bootstrap modal ?
+                    buttonStyle: { // style the button
+                        color: '#3bafda',
+                        background: '#fff',
+                        fontSize: '16px',
+                        padding: '10px 15px',
+                    },
 
-        });
-    });
-</script>
+                });
+            });
+        </script>
     </div>
     <?php
 }

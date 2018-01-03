@@ -29,11 +29,11 @@
         
         $( settings.target ).append( '<a href="#" class="' + settings.buttonClass.replace('.','') + '">' + settings.buttonText + '</a>' );
         $( settings.target ).append('<div><br><img src="#" style="display: none; width: ' + settings.previewSize + '"/></div>')
-        var selector = $(this).parent( settings.target );
-        var img=selector.find( 'input' ).val();
-        if (img) {
-            selector.find('img').attr('src', img).show();
-        }
+        // var selector = $(this).parent( settings.target );
+        // var img=selector.find( 'input' ).val();
+        // if (img) {
+        //     selector.find('img').attr('src', img).show();
+        // }
 
 
 
