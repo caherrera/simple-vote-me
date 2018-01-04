@@ -67,74 +67,6 @@ add_action('wp_ajax_nopriv_simplevoteme_compliments_addvote', 'gt_simplevoteme_c
 add_action('wp_ajax_simplevoteme_compliments_addvote', 'gt_simplevoteme_compliments_addvote');
 
 
-function gt_simplevoteme_printvotelink_compliments_auto($content)
-{
-
-    $home = get_option('gt_simplevoteme_auto_insert_home');
-
-    $auto = get_option('gt_simplevoteme_auto_insert_content');
-
-    if ( ! $auto && (is_home() && ! $home)) {
-        return ($content);
-    }
-
-    $login = get_option('gt_simplevoteme_only_login'); //after auto, do not waste resources if is not necessary :)
-
-
-    if ($login && ! is_user_logged_in()) {
-        return ($content);
-    }
-
-
-    $position = get_option('gt_simplevoteme_position');//after login, do not waste resources if is not necessary :)
-
-    if (is_home() && $home) { //if is home and home is active
-        if ( ! $position) {
-            return $content . gt_simplevoteme_getvotelink();
-        } else if ($position == 1) {
-            return gt_simplevoteme_getvotelink() . $content;
-        } else if ($position == 2) {
-            $linksVote = gt_simplevoteme_getvotelink(); //launch just once
-
-            return $linksVote . $content . $linksVote;
-        } else {
-            return $content;
-        }//nothing expected
-
-    } else if (($auto == 1 || $auto == 3) && is_single()) {//if is only post(1) or post&page(3)
-        if ( ! $position) {
-            return $content . gt_simplevoteme_getvotelink();
-        } else if ($position == 1) {
-            return gt_simplevoteme_getvotelink() . $content;
-        } else if ($position == 2) {
-            $linksVote = gt_simplevoteme_getvotelink(); //launch just once
-
-            return $linksVote . $content . $linksVote;
-        } else {
-            return $content;
-        }//nothing expected
-
-    } else if (($auto == 2 || $auto == 3) && is_page()) {//if is only page(2) or post&page(3)
-        if ( ! $position) {
-            return $content . gt_simplevoteme_getvotelink();
-        } else if ($position == 1) {
-            return gt_simplevoteme_getvotelink() . $content;
-        } else if ($position == 3) {
-            $linksVote = gt_simplevoteme_getvotelink(); //launch just once
-
-            return $linksVote . $content . $linksVote;
-        } else {
-            return $content;
-        }//nothing expected
-    } else {
-        return ($content);
-    } //nothing expected
-
-
-}
-
-add_filter('the_content', 'gt_simplevoteme_printvotelink_compliments_auto');
-
 function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id = false, $tipo = 'h')
 {
     $votemelink        = "";
@@ -249,9 +181,9 @@ function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id
 
     if ( ! $noLinks) {
 
-        $linkPositivo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 1,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("good") . '</a>';
-        $linkNegativo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 2,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("bad") . '</a>';
-        $linkNeutral  = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 0,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("neutral") . '</a>';
+        $linkPositivo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 1,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("good") . '</a>';
+        $linkNegativo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 2,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("bad") . '</a>';
+        $linkNeutral  = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 0,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("neutral") . '</a>';
     } else {
         $linkPositivo = gt_simplevoteme_compliment_getimgvote("good");
         $linkNegativo = gt_simplevoteme_compliment_getimgvote("bad");

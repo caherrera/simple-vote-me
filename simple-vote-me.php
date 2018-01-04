@@ -171,16 +171,18 @@ function gt_simplevoteme_getimgvote($type)
     }
 }
 
-function gt_simplevoteme_getvotelink($noLinks = false, $tipo = 'h')
+function gt_simplevoteme_getvotelink($noLinks = false, $post_ID = false,$tipo = 'h')
 {
     $votemelink        = "";
     $user_ID           = get_current_user_id();
     $limitVotesPerUser = get_option('gt_simplevoteme_votes');
 
-    if ( ! $noLinks) {
-        $post_ID = get_the_ID();
-    } else {
-        $post_ID = $_POST['postid'];
+    if (!$post_ID) {
+        if ( ! $noLinks) {
+            $post_ID = get_the_ID();
+        } else {
+            $post_ID = $_POST['postid'];
+        }
     }
 
     $votes = get_post_meta($post_ID, '_simplevotemevotes', true) != "" ? get_post_meta($post_ID, '_simplevotemevotes',
@@ -287,9 +289,9 @@ function gt_simplevoteme_getvotelink($noLinks = false, $tipo = 'h')
 
     if ( ! $noLinks) {
 
-        $linkPositivo = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 1,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("good") . '</a>';
-        $linkNegativo = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 2,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("bad") . '</a>';
-        $linkNeutral  = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 0,' . $user_ID . ');">' . gt_simplevoteme_getimgvote("neutral") . '</a>';
+        $linkPositivo = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 1,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("good") . '</a>';
+        $linkNegativo = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 2,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("bad") . '</a>';
+        $linkNeutral  = '<a onclick="simplevotemeaddvote(' . $post_ID . ', 0,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("neutral") . '</a>';
     } else {
         $linkPositivo = gt_simplevoteme_getimgvote("good");
         $linkNegativo = gt_simplevoteme_getimgvote("bad");
@@ -299,10 +301,13 @@ function gt_simplevoteme_getvotelink($noLinks = false, $tipo = 'h')
     $title = get_option('gt_simplevoteme_title');
 
     $votemelink = "<div class='simplevotemeWrapper $tipo' id='simplevoteme-$post_ID' >$title";
-    $votemelink .= "<span class='bad'>$linkNegativo <span class='result'>$votemePercentNegative</span></span>";
-    $votemelink .= "<span class='neutro'>$linkNeutral <span class='result'>$votemePercentNeutral</span></span>";
     $votemelink .= "<span class='good'>$linkPositivo <span class='result'>$votemePercentPositive</span></span>";
-    $votemelink .= "</div>";
+    $votemelink .= "<span class='neutro'>$linkNeutral <span class='result'>$votemePercentNeutral</span></span>";
+    $votemelink .= "<span class='bad'>$linkNegativo <span class='result'>$votemePercentNegative</span></span>";
+
+    $imgloading=SIMPLEVOTEMESURL.'/img/ajax_loader_red_32.gif';
+    $votemelink .= "</div><script type='text/javascript'>var simplevotemeLoading='$imgloading';</script>";
+
 
     $result = $votemelink;
 
