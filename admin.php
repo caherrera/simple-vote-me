@@ -76,9 +76,9 @@ function gt_simplevoteme_page_admin()
             $gt_simplevoteme_reset = true;
             unset($_POST['gt_simplevoteme_reset']);
         }
-        foreach ($_POST as $item) {
+        foreach ($_POST as $item => $value) {
             if (preg_match('/gt_simplevoteme_.*/', $item)) {
-                update_option($item, $_POST[$item]);
+                update_option($item, $value);
             }
         }
 
