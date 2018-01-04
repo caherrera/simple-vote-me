@@ -198,7 +198,11 @@ function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id
     $votemelink .= "<span class='bad'>$linkNegativo <span class='result'>$votemePercentNegative</span></span>";
     $votemelink .= "</div>";
 
+    $imgloading=SIMPLEVOTEMESURL.'/img/ajax_loader_red_32.gif';
+    $votemelink .= "</div><script type='text/javascript'>var simplevotemeLoading='$imgloading';</script>";
+
     $result = $votemelink;
+
 
 
     return $result;
