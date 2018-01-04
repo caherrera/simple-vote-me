@@ -161,12 +161,10 @@ add_action('wp_enqueue_scripts', 'gt_simplevoteme_enqueuescripts');
 
 function gt_simplevoteme_getimgvote($type)
 {
-    $custom = get_option('gt_simplevoteme_custom_img');
-    if ( ! $custom) {
+    $customImg = get_option("gt_simplevoteme_custom_img_$type");
+    if ( ! $customImg) {
         return "<img src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
     } else {
-        $customImg = get_option("gt_simplevoteme_custom_img_$type");
-
         return "<img src='$customImg'/>";
     }
 }

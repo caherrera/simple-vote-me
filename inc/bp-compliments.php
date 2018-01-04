@@ -220,10 +220,9 @@ function get_compliment_votes($compliment_id = false)
 
 function gt_simplevoteme_compliment_getimgvote($type)
 {
-    $custom    = get_option('gt_simplevoteme_custom_img');
     $customImg = get_option("gt_simplevoteme_compliment_custom_img_$type");
 
-    if ( ! $custom || ($custom && ! $customImg)) {
+    if ( ! $customImg) {
         return "<img src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
     } else {
         return "<img src='$customImg'/>";
