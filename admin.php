@@ -457,8 +457,12 @@ function gt_simplevoteme_content_column_row($column)
 function gt_simplevoteme_metabox_votes($post)
 {
     wp_nonce_field(basename(__FILE__), "meta-box-nonce");
-
     ?>
+    <script>jQuery(document).ready(function() {
+        jQuery('#gt_simplevoteme_votes').mouseout(function(){
+            jQuery('.gt_simplevoteme_votes_list.active').slideUp().removeClass('active');
+        });
+        });</script>
     <ul class="categorychecklist" style="text-transform: capitalize;">
         <?php
         $votes = get_post_meta($post->ID, '_simplevotemevotes', true) != '' ? get_post_meta($post->ID,
@@ -469,8 +473,13 @@ function gt_simplevoteme_metabox_votes($post)
             foreach ($voteType as $vote) {
                 if ($vote != 0) {
                     $user          = get_userdata($vote);
-                    $users[$key][] = '<a href="' . get_author_posts_url($vote,
-                            $user->display_name) . '" target="_blank">' . $user->display_name . '</a>';
+                    if (is_plugin_active('buddypress/bp-loader.php')) {
+	                    $users[ $key ][] = '<a href="' .get_home_url().'/members/'.  ( $user->user_nicename)
+			                    . '" target="_blank">' . get_avatar($user->ID,48). '<b>'.$user->display_name . '</b></a>';
+                    }else {
+	                    $users[ $key ][] = '<a href="' . get_author_posts_url( $vote,
+			                    $user->display_name ) . '" target="_blank">' . $user->display_name . '</a>';
+                    }
 
                 } else {
                     $users[$key][] = __('Anonymous');
@@ -478,16 +487,21 @@ function gt_simplevoteme_metabox_votes($post)
             }
         }
         ?>
-        <li><span>Totals:</span><?php echo sizeof($votes, 1) - 3; ?></li>
-        <?php foreach ($users as $key => $usersCat) {
-            echo "<li><span>$key:</span><ul class='children'>";
-            foreach ($usersCat as $usr) {
-                echo "<li>$usr</li>";
-            }
+        <li><span>Total:</span><?php echo sizeof($votes, 1) - 3; ?></li>
+        <?php
+	        gt_simplevoteme_draw_resume($key='positives',$users[$key]);
+	        gt_simplevoteme_draw_resume($key='neutrals',$users[$key]);
+	        gt_simplevoteme_draw_resume($key='negatives',$users[$key]);
 
-            echo "</ul></li>";
-        } ?>
+        ?>
     </ul>
+	<?php
+	gt_simplevoteme_draw_votes($key='positives',$users[$key]);
+	gt_simplevoteme_draw_votes($key='neutrals',$users[$key]);
+	gt_simplevoteme_draw_votes($key='negatives',$users[$key]);
+
+	?>
+
     <style>
         #gt_simplevoteme_votes > .inside ul {
             overflow: auto;
@@ -497,6 +511,33 @@ function gt_simplevoteme_metabox_votes($post)
             width: 33.333%;
             padding: 0;
             float: left;
+            text-align: center;
+        }
+
+        #gt_simplevoteme_votes ul.categorychecklist > li >ul.children {
+            display: none;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list{
+            display: none;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
+            clear: both;
+            float: left;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a {
+            display: block;
+            float: left;
+            width: 100%;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a > * {
+            float:left;
+            height: 48px;
+            line-height: 48px;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li img.avatar {
+            border-radius: 100%;
+            margin-right: 4px;
+
         }
 
         #gt_simplevoteme_votes span {
@@ -511,6 +552,29 @@ function gt_simplevoteme_metabox_votes($post)
     </style>
     <?php
 
+}
+
+function gt_simplevoteme_draw_votes($key,$usersCat){
+	echo "<ul id='gt_simplevoteme_votes_$key' class='children gt_simplevoteme_votes_list'>";
+	foreach ($usersCat as $usr) {
+		echo "<li>$usr</li>";
+	}
+
+	echo "</ul>";
+}
+function gt_simplevoteme_draw_resume($key,$usersCat){
+	$countUsersCat=count($usersCat);
+	switch($key) {
+		case 'positives':$imgvote=gt_simplevoteme_getimgvote('good');break;
+		case 'neutrals':$imgvote=gt_simplevoteme_getimgvote('neutral');break;
+		case 'negatives':$imgvote=gt_simplevoteme_getimgvote('bad');break;
+	}
+	$mouseOver="if(!$('#gt_simplevoteme_votes_$key').hasClass('active'))".'{'."$('.gt_simplevoteme_votes_list.active').removeClass('active').hide();$('#gt_simplevoteme_votes_$key').slideDown().addClass('active');}";
+
+
+	echo "<li><div onmouseover=\"$mouseOver\">$imgvote $countUsersCat</div>";
+
+	echo "</li>";
 }
 
 function gt_simplevoteme_add_meta_box_votes()
