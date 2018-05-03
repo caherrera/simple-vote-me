@@ -459,7 +459,7 @@ function gt_simplevoteme_metabox_votes($post)
     wp_nonce_field(basename(__FILE__), "meta-box-nonce");
     ?>
     <script>jQuery(document).ready(function() {
-        jQuery('#gt_simplevoteme_votes').mouseout(function(){
+        jQuery('#gt_simplevoteme_votes').mouseleave(function(){
             jQuery('.gt_simplevoteme_votes_list.active').slideUp().removeClass('active');
         });
         });</script>
