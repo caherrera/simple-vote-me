@@ -390,9 +390,9 @@ gt_simplevoteme_custom_columns();
 function gt_simplevoteme_extra_columns($columns)
 {
     $columns['simplevotemetotal']    = __('Votes');
-    $columns['simplevotemenegative'] = __(':(');
-    $columns['simplevotemeneutral']  = __(':|');
-    $columns['simplevotemepositive'] = __(':)');
+    $columns['simplevotemenegative'] = gt_simplevoteme_getimgvote('bad');
+    $columns['simplevotemeneutral']  = gt_simplevoteme_getimgvote('neutral');
+    $columns['simplevotemepositive'] = gt_simplevoteme_getimgvote('good');
 
     return $columns;
 }
@@ -421,7 +421,7 @@ function gt_simplevoteme_content_column_row($column)
             }
         }
     }
-
+    echo '<div class="simplevoteme_admin_list">';
     switch ($column):
         case('simplevotemepositive'):
             echo count($votes['positives']);
@@ -449,7 +449,7 @@ function gt_simplevoteme_content_column_row($column)
         default:
             break;
     endswitch;
-
+    echo '</div>';
 }
 
 
@@ -590,3 +590,20 @@ function gt_simplevoteme_add_meta_box_votes()
 
 add_action("add_meta_boxes", "gt_simplevoteme_add_meta_box_votes");
 
+add_action('admin_head', 'gt_simplevoteme_add_admin_head');
+
+function gt_simplevoteme_add_admin_head() {
+	echo '<style>
+    img.gt_simplevoteme_custom_img_bad,
+    img.gt_simplevoteme_custom_img_neutral,
+    img.gt_simplevoteme_custom_img_good
+    { width: 32px;   }
+    
+    div.simplevoteme_admin_list {
+    overflow: hidden;
+    width: 32px;
+    height: 23px;
+    line-height: 23px;
+    } 
+  </style>';
+}

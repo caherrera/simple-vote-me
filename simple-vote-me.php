@@ -163,9 +163,9 @@ function gt_simplevoteme_getimgvote($type)
 {
     $customImg = get_option("gt_simplevoteme_custom_img_$type");
     if ( ! $customImg) {
-        return "<img src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
+        return "<img class=\"gt_simplevoteme_custom_img_$type\" src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
     } else {
-        return "<img src='$customImg'/>";
+        return "<img src='$customImg' class=\"gt_simplevoteme_custom_img_$type\" />";
     }
 }
 
