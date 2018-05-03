@@ -5,10 +5,10 @@ Author: Carlos Herrera
 Author URI: https://github.com/caherrera/simple-vote-me
 Contributors:
 Tags: vote, poll,smileys, count vote,good,bad,neutral,custom vote, recount, custom poll
-Version: 1.3.1-solu4b
+Version: 1.4.0
 Requires at least: 3.0
-Tested up to: 4.8.3
-Stable tag: 1.3.1
+Tested up to: 4.9.5
+Stable tag: 1.4.0
 Donate link:
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
