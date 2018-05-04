@@ -458,11 +458,27 @@ function gt_simplevoteme_metabox_votes($post)
 {
     wp_nonce_field(basename(__FILE__), "meta-box-nonce");
     ?>
-    <script>jQuery(document).ready(function() {
+    <script type="text/javascript">
+
+    jQuery(document).ready(function() {
         jQuery('#gt_simplevoteme_votes').mouseleave(function(){
             jQuery('.gt_simplevoteme_votes_list.active').slideUp().removeClass('active');
         });
-        });</script>
+        jQuery('.gt_simplevoteme_resume_div').mouseover(function(){
+            var key=$(this).data('key');
+            if(!$(this).hasClass('active')){
+
+                $('.gt_simplevoteme_resume_div.active').removeClass('active');
+                $('.gt_simplevoteme_votes_list.active').removeClass('active').hide();
+                $('#gt_simplevoteme_votes_'+key).slideDown().addClass('active');
+                $(this).addClass('active');
+            }
+
+        });
+
+    });
+
+    </script>
     <ul class="categorychecklist" style="text-transform: capitalize;">
         <?php
         $votes = get_post_meta($post->ID, '_simplevotemevotes', true) != '' ? get_post_meta($post->ID,
@@ -508,7 +524,7 @@ function gt_simplevoteme_metabox_votes($post)
         }
 
         #gt_simplevoteme_votes ul.categorychecklist > li {
-            width: 33.333%;
+            width: 33%;
             padding: 0;
             float: left;
             text-align: center;
@@ -519,10 +535,17 @@ function gt_simplevoteme_metabox_votes($post)
         }
         #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list{
             display: none;
+            margin-top:-14px;
+            border-top:0;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+
         }
         #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
             clear: both;
             float: left;
+            margin: 10px 0 0 10px;
         }
         #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a {
             display: block;
@@ -533,6 +556,9 @@ function gt_simplevoteme_metabox_votes($post)
             float:left;
             height: 48px;
             line-height: 48px;
+        }
+        #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active{
+
         }
         #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li img.avatar {
             border-radius: 100%;
@@ -548,8 +574,22 @@ function gt_simplevoteme_metabox_votes($post)
         #gt_simplevoteme_votes ul.categorychecklist > li:first-child {
             width: 100%;
             margin-bottom: .5em;
+            padding-top: 0;
+            border: 0;
+        }
+        #gt_simplevoteme_votes ul.categorychecklist > li {
+            padding: 15px 0px;
+            border-bottom:1px solid #cccccc;
+
+
+        }
+        #gt_simplevoteme_votes ul.categorychecklist > li.active {
+            border:1px solid #cccccc;
+            border-bottom: 0;
+
         }
     </style>
+
     <?php
 
 }
@@ -569,12 +609,12 @@ function gt_simplevoteme_draw_resume($key,$usersCat){
 		case 'neutrals':$imgvote=gt_simplevoteme_getimgvote('neutral');break;
 		case 'negatives':$imgvote=gt_simplevoteme_getimgvote('bad');break;
 	}
-	$mouseOver="if(!$('#gt_simplevoteme_votes_$key').hasClass('active'))".'{'."$('.gt_simplevoteme_votes_list.active').removeClass('active').hide();$('#gt_simplevoteme_votes_$key').slideDown().addClass('active');}";
 
 
-	echo "<li><div onmouseover=\"$mouseOver\">$imgvote $countUsersCat</div>";
 
-	echo "</li>";
+	echo "<li data-key=\"$key\" class=\"gt_simplevoteme_resume_div\" >$imgvote $countUsersCat</li>";
+
+
 }
 
 function gt_simplevoteme_add_meta_box_votes()
@@ -594,9 +634,9 @@ add_action('admin_head', 'gt_simplevoteme_add_admin_head');
 
 function gt_simplevoteme_add_admin_head() {
 	echo '<style>
-    img.gt_simplevoteme_custom_img_bad,
-    img.gt_simplevoteme_custom_img_neutral,
-    img.gt_simplevoteme_custom_img_good
+    .wp-list-table img.gt_simplevoteme_custom_img_bad,
+    .wp-list-table img.gt_simplevoteme_custom_img_neutral,
+    .wp-list-table img.gt_simplevoteme_custom_img_good
     { width: 32px;   }
     
     div.simplevoteme_admin_list {
