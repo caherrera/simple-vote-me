@@ -11,6 +11,7 @@ Author URI: http://www.gonzalotorreras.com
 define('SIMPLEVOTEMESURL', WP_PLUGIN_URL . "/" . dirname(plugin_basename(__FILE__)));
 
 include_once(plugin_dir_path(__FILE__) . '/admin.php');
+include_once(plugin_dir_path(__FILE__) . '/inc/list-votes.php');
 //    include_once(plugin_dir_path(__FILE__) .'/inc/functions.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/shortcodes.php');
 include_once(plugin_dir_path(__FILE__) . '/inc/bp-compliments.php');
@@ -307,8 +308,7 @@ function gt_simplevoteme_getvotelink($noLinks = false, $post_ID = false,$tipo = 
     $votemelink .= "</div><script type='text/javascript'>var simplevotemeLoading='$imgloading';</script>";
 
 
-    $result = $votemelink;
-
+    $result = $votemelink .	gt_simplevoteme_draw_list_votes($votes,$post_ID);
 
     return $result;
 }
