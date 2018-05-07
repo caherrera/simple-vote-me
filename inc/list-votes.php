@@ -7,9 +7,9 @@
  */
 
 function gt_simplevoteme_draw_list_votes($votes,$id) {
-    static $c;
+
     ob_start();
-	if (!$c) {
+
 	?>
 
         <style>
@@ -58,10 +58,18 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
             }
             #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active{
                 padding: 0px;
+                width: 300px;
+                margin: auto;
+            }
+            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active li{
+                padding: 0px;
+                list-style: none;
+
             }
             #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li img.avatar {
                 border-radius: 100%;
                 margin-right: 4px;
+                margin-top: 0;
 
             }
 
@@ -88,8 +96,7 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
 
             }
         </style>
-        <?php }
-        $c=1;?>
+
 	<ul data-simplevotemeid="<?php echo $id?>" class="gt_simplevoteme categorychecklist" style="text-transform: capitalize;display: none">
 		<?php
 
