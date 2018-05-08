@@ -400,7 +400,7 @@ function gt_simplevoteme_addvote() {
 
 	$noLinks = get_option( 'gt_simplevoteme_votes' );
 
-	$result = gt_simplevoteme_getvotelink( $noLinks,$post_ID );
+	$result = gt_simplevoteme_getvotelink( $noLinks, $post_ID );
 
 
 	// Return the String
@@ -409,14 +409,14 @@ function gt_simplevoteme_addvote() {
 
 function gt_simplevoteme_insertvote( $votes, $user_ID, $type ) {
 
-	if ( isset( $votes['neutrals'][ $user_ID ] ) ) {
-		unset( $votes['neutrals'][ $user_ID ] );
+	if ( false !== ( $key = array_search( $user_ID, $votes['neutrals'] ) ) ) {
+		unset( $votes['neutrals'][ $key ] );
 	}
-	if ( isset( $votes['positives'][ $user_ID ] ) ) {
-		unset( $votes['positives'][ $user_ID ] );
+	if ( false !== ( $key = array_search( $user_ID, $votes['positives'] ) ) ) {
+		unset( $votes['positives'][ $key ] );
 	}
-	if ( isset( $votes['negatives'][ $user_ID ] ) ) {
-		unset( $votes['negatives'][ $user_ID ] );
+	if ( false !== ( $key = array_search( $user_ID, $votes['negatives'] ) ) ) {
+		unset( $votes['negatives'][ $key ] );
 	}
 
 	switch ( $type ) {
@@ -430,6 +430,7 @@ function gt_simplevoteme_insertvote( $votes, $user_ID, $type ) {
 			$votes['negatives'][ $user_ID ] = $user_ID;
 			break;
 	}
+
 
 	return $votes;
 }
