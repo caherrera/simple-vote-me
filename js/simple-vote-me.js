@@ -1,44 +1,66 @@
-var simplevotemeaddvoteQueue = {posts: {}, compliment: {}};
+var simplevotemeaddvoteQueue = {};
+function simplevotemeShowLoading(o){
+    o = jQuery(o);
+    o.find('img').attr('src',simplevotemeLoading);
+
+
+}
 
 function simplevotemeaddvote(postId, tipo, userID, o) {
-    if (!simplevotemeaddvoteQueue.posts.hasOwnProperty(postId)) {
-        simplevotemeaddvoteQueue.posts[postId] = true;
-        o = jQuery(o);
-        o.html('<img src="' + simplevotemeLoading + '">');
+    if (!simplevotemeaddvoteQueue.hasOwnProperty('p'+postId)) {
+        simplevotemeaddvoteQueue['p'+postId] = true;
+        simplevotemeShowLoading(o);
 
         return simplevotemeaddvoteajax(postId, {
             action: 'simplevoteme_addvote',
             tipo: tipo,
             postid: postId,
             userid: userID
-        });
+        },o);
     }
 }
 
 function simplevotemeaddvotecompliment(complimentid, tipo, userID, o) {
-    if (!simplevotemeaddvoteQueue.compliment.hasOwnProperty(complimentid)) {
-        simplevotemeaddvoteQueue.compliment[complimentid] = true;
-        o = jQuery(o);
-        o.html('<img src="' + simplevotemeLoading + '">');
+    if (!simplevotemeaddvoteQueue.hasOwnProperty('c'+complimentid)) {
+        simplevotemeaddvoteQueue['c'+complimentid] = true;
+        simplevotemeShowLoading(o);
         return simplevotemeaddvoteajax(complimentid, {
             action: 'simplevoteme_compliments_addvote',
             tipo: tipo,
             complimentid: complimentid,
             userid: userID
-        });
+        },o);
     }
 }
 
-function simplevotemeaddvoteajax(id, data) {
+function simplevotemeaddvoteajax(id, data,o) {
     jQuery.ajax({
         type: 'POST',
         url: gtsimplevotemeajax.ajaxurl,
         data: data,
-        success: function (data, textStatus, XMLHttpRequest) {
+        success: function (result, textStatus, XMLHttpRequest) {
 
             var linkid = '#simplevoteme-' + id;
-            jQuery(linkid).html('');
-            jQuery(linkid).append(data);
+            var c=jQuery("<div id=result9999>"+result+'</div>');
+
+            jQuery(linkid).find('#gt_simplevoteme_votes_positives').html(c.find('#gt_simplevoteme_votes_positives').html());
+            jQuery(linkid).find('#gt_simplevoteme_votes_neutrals').html(c.find('#gt_simplevoteme_votes_neutrals').html());
+            jQuery(linkid).find('#gt_simplevoteme_votes_negatives').html(c.find('#gt_simplevoteme_votes_negatives').html());
+
+            jQuery(linkid).find('.good span.result').html(c.find('.good span.result').html());
+            jQuery(linkid).find('.neutro span.result').html(c.find('.neutro span.result').html());
+            jQuery(linkid).find('.bad span.result').html(c.find('.bad span.result').html());
+
+            jQuery(linkid).find('.good img').attr('src',c.find('.good img').attr('src'));
+            jQuery(linkid).find('.neutro img').attr('src',c.find('.neutro img').attr('src'));
+            jQuery(linkid).find('.bad img').attr('src',c.find('.bad img').attr('src'));
+
+
+            if (data.hasOwnProperty('postid')) {
+                delete simplevotemeaddvoteQueue['p'+data.postid];
+            }else{
+                delete simplevotemeaddvoteQueue['c'+data.complimentid];
+            }
         },
         error: function (MLHttpRequest, textStatus, errorThrown) {
             console.log(errorThrown);

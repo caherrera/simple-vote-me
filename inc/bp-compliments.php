@@ -41,21 +41,12 @@ function gt_simplevoteme_compliments_addvote()
     $votes         = get_compliment_votes($compliment_ID);
 
 
-    switch ($type) {
-        case 0:
-            $votes['neutrals'][] = $user_ID;
-            break;
-        case 1:
-            $votes['positives'][] = $user_ID;
-            break;
-        case 2:
-            $votes['negatives'][] = $user_ID;
-            break;
-    }
-    update_compliment_meta($compliment_ID, '_simplevotemevotes', $votes);
+	$votes=gt_simplevoteme_insertvote($votes,$user_ID,$type);
 
+	update_compliment_meta($compliment_ID, '_simplevotemevotes', $votes);
 
-    $result = gt_simplevoteme_compliment_getvotelink(1, $compliment_ID);
+	$noLinks=get_option('gt_simplevoteme_votes');
+    $result = gt_simplevoteme_compliment_getvotelink($noLinks, $compliment_ID);
 
 
     // Return the String
