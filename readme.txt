@@ -5,10 +5,10 @@ Author: Carlos Herrera
 Author URI: https://github.com/caherrera/simple-vote-me
 Contributors:
 Tags: vote, poll,smileys, count vote,good,bad,neutral,custom vote, recount, custom poll
-Version: 1.4.3
+Version: 1.4.4
 Requires at least: 3.0
 Tested up to: 4.9.5
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 Donate link:
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -81,6 +81,9 @@ The plugin uses minimum CSS and inserts valid HTML when necessary.
 
 
 == Changelog ==
+= 1.4.4 =
+* Adding list of votes to Compliments
+
 = 1.4.3 =
 * Adding support to old votes
 
