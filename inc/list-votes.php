@@ -17,7 +17,7 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
                 width: 251px; clear: both; margin: auto
             }
             #gt_simplevoteme_votes > .inside ul {
-                overflow: auto;
+                overflow: hidden;
             }
 
             #gt_simplevoteme_votes ul.categorychecklist > li {
@@ -29,14 +29,11 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
 
             #gt_simplevoteme_votes ul.categorychecklist > li >ul.children {
                 display: none;
+                overflow: hidden;
             }
             #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list{
                 display: none;
-                /*margin-top:-14px;*/
-                /*border-top:0;*/
-                /*border-left: 1px solid #ccc;*/
-                /*border-right: 1px solid #ccc;*/
-                /*border-bottom: 1px solid #ccc;*/
+                overflow: hidden;
 
             }
             #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
