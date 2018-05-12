@@ -90,15 +90,12 @@ function simplevotemeaddvoteajax(id, data, o) {
                 div.append(jQuery(this).parent().find('ul.gt_simplevoteme_votes_list'));
             }
             options.wrapperList = $(this).find('#gt_simplevoteme_votes');
-            if (jQuery('.simplevotemeWrapper').length==1) {
-                options.wrapperList.css('position','relative');
-            }
+
             var wrapper = jQuery(this);
 
-            jQuery()
 
             wrapper.find(options.buttons).mouseover(function () {
-                options.wrapperList.show();
+
                 var key = jQuery(this).data('key');
                 if (!key) {
                     if (jQuery(this).hasClass('good')) {
@@ -118,8 +115,17 @@ function simplevotemeaddvoteajax(id, data, o) {
                         options.listActive.removeClass('active').hide();
                     }
                     options.listActive = jQuery(wrapper).find('#gt_simplevoteme_votes_' + key);
-                    options.listActive.slideDown().addClass('active');
                     options.buttonActive = jQuery(this);
+
+                    if (options.listActive.children().length) {
+                        if (jQuery('.simplevotemeWrapper').length == 1) {
+                            options.wrapperList.css('margin-left', (options.wrapperList.parent().width() - options.wrapperList.width()) / 2);
+                        }
+                        options.wrapperList.show();
+                    } else {
+                        wrapper.trigger('mouseleave');
+                    }
+                    options.listActive.slideDown().addClass('active');
                     options.buttonActive.addClass('active');
 
                 }
