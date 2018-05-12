@@ -81,6 +81,9 @@ The plugin uses minimum CSS and inserts valid HTML when necessary.
 
 
 == Changelog ==
+= 1.4.6.1 =
+* css issue
+
 = 1.4.6 =
 * Change vote list to floating
 
