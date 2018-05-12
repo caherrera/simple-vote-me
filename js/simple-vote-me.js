@@ -90,7 +90,12 @@ function simplevotemeaddvoteajax(id, data, o) {
                 div.append(jQuery(this).parent().find('ul.gt_simplevoteme_votes_list'));
             }
             options.wrapperList = $(this).find('#gt_simplevoteme_votes');
+            if (jQuery('.simplevotemeWrapper').length==1) {
+                options.wrapperList.css('position','relative');
+            }
             var wrapper = jQuery(this);
+
+            jQuery()
 
             wrapper.find(options.buttons).mouseover(function () {
                 options.wrapperList.show();
@@ -146,6 +151,7 @@ function simplevotemeaddvoteajax(id, data, o) {
 jQuery(document).ready(function () {
 
     if (jQuery('.simplevotemeWrapper').length) {
+
         jQuery('.gt_simplevoteme.categorychecklist').remove();
         jQuery('.simplevotemeWrapper').simplevotemeShowVotes({wrap: true});
 
