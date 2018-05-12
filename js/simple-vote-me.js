@@ -124,6 +124,7 @@ function simplevotemeaddvoteajax(id, data, o) {
                         options.wrapperList.show();
                     } else {
                         wrapper.trigger('mouseleave');
+                        return;
                     }
                     options.listActive.slideDown().addClass('active');
                     options.buttonActive.addClass('active');
