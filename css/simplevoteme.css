@@ -1,32 +1,36 @@
-.simplevotemeWrapper{
-    text-align:center;
-    color:#36413c;
+.simplevotemeWrapper {
+    text-align: center;
+    color: #36413c!important;
     overflow-y: auto;
 }
-.simplevotemeWrapper img{
+
+.simplevotemeWrapper img {
     /*width:50%;*/
     vertical-align: middle;
 }
 
-.simplevotemeWrapper > span{
+.simplevotemeWrapper > span {
     margin: 5px auto;
     max-width: 150px;
     min-width: 100px;
     /*width: 60%;*/
     padding: 5px;
-    display:block;
+    display: block;
     text-align: center;
     border-radius: 1em;
 }
-.simplevotemeWrapper span.bad{
+
+.simplevotemeWrapper span.bad {
     /*background:  rgba(233,83,69, 0.2);*/
     /*border: 1px solid rgba(233,83,69,1);*/
 }
-.simplevotemeWrapper span.neutro{
+
+.simplevotemeWrapper span.neutro {
     /*background:  rgba(245,130,60, 0.2);*/
     /*border: 1px solid rgba(245,130,60, 1);*/
 }
-.simplevotemeWrapper span.good{
+
+.simplevotemeWrapper span.good {
     /*background:  rgba(215,231,93, 0.2);*/
     /*border: 1px solid rgba(215,231,93, 1);*/
 }
@@ -34,16 +38,122 @@
 .simplevotemeWrapper span.result {
     display: block;
 }
-.simplevotemeWrapper span.result small{
-    font-size:.85em;
+
+.simplevotemeWrapper span.result small {
+    font-size: .85em;
 }
 
-.simplevotemeWrapper a{
-    cursor:pointer;
+.simplevotemeWrapper a {
+    cursor: pointer;
 }
 
 /** For Horizontal **/
-.simplevotemeWrapper.h > span{
+.simplevotemeWrapper.h > span {
     display: inline-block;
     margin-right: 10px;
+}
+
+/** New custom CSS **/
+.simplevotemeWrapper #gt_simplevoteme_votes {
+    width: 251px;
+    clear: both;
+    margin: auto;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 99;
+    position: absolute;
+    background: #fff;
+    display: none;
+
+
+}
+
+#gt_simplevoteme_votes > .inside ul {
+    overflow: hidden;
+}
+
+#gt_simplevoteme_votes ul.categorychecklist > li {
+    width: 33%;
+    padding: 0;
+    float: left;
+    text-align: center;
+}
+
+#gt_simplevoteme_votes ul.categorychecklist > li > ul.children {
+    display: none;
+    overflow: hidden;
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list {
+    display: none;
+    overflow: hidden;
+
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
+    clear: both;
+    /*float: left;*/
+    margin: 10px 0;
+    list-style: none;
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a {
+    display: block;
+    float: left;
+    width: 100%;
+    color: inherit !important;
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a > * {
+    float: left;
+    height: 48px;
+    line-height: 48px;
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active {
+    padding: 0px;
+    width: 100%;
+    margin: auto;
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active li {
+    padding: 0px;
+    list-style: none;
+    width: 100%;
+    text-align: left;
+
+}
+
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li img.avatar {
+    border-radius: 100%;
+    margin-right: 4px;
+    margin-top: 0;
+
+}
+
+#gt_simplevoteme_votes span {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+#gt_simplevoteme_votes ul.categorychecklist > li:first-child {
+    width: 100%;
+    margin-bottom: .5em;
+    padding-top: 0;
+    /*border: 0;*/
+}
+
+#gt_simplevoteme_votes ul.categorychecklist > li {
+    padding: 15px 0px;
+    /*border-bottom:1px solid #cccccc;*/
+
+}
+
+#gt_simplevoteme_votes ul.categorychecklist > li.active,
+.simplevotemeWrapper.h > span.active {
+
+    background: #ddd;
+
 }

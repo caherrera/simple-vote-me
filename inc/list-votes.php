@@ -13,85 +13,7 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
 	?>
 
         <style>
-            .simplevotemeWrapper #gt_simplevoteme_votes {
-                width: 251px; clear: both; margin: auto
-            }
-            #gt_simplevoteme_votes > .inside ul {
-                overflow: hidden;
-            }
 
-            #gt_simplevoteme_votes ul.categorychecklist > li {
-                width: 33%;
-                padding: 0;
-                float: left;
-                text-align: center;
-            }
-
-            #gt_simplevoteme_votes ul.categorychecklist > li >ul.children {
-                display: none;
-                overflow: hidden;
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list{
-                display: none;
-                overflow: hidden;
-
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
-                clear: both;
-                float: left;
-                margin: 10px 0 0 10px;
-                list-style: none;
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a {
-                display: block;
-                float: left;
-                width: 100%;
-                color:inherit !important;
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a > * {
-                float:left;
-                height: 48px;
-                line-height: 48px;
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active{
-                padding: 0px;
-                width: 300px;
-                margin: auto;
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active li{
-                padding: 0px;
-                list-style: none;
-
-            }
-            #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li img.avatar {
-                border-radius: 100%;
-                margin-right: 4px;
-                margin-top: 0;
-
-            }
-
-            #gt_simplevoteme_votes span {
-                font-size: 1.1em;
-                font-weight: bold;
-            }
-
-            #gt_simplevoteme_votes ul.categorychecklist > li:first-child {
-                width: 100%;
-                margin-bottom: .5em;
-                padding-top: 0;
-                /*border: 0;*/
-            }
-            #gt_simplevoteme_votes ul.categorychecklist > li {
-                padding: 15px 0px;
-                /*border-bottom:1px solid #cccccc;*/
-
-            }
-            #gt_simplevoteme_votes ul.categorychecklist > li.active ,
-            .simplevotemeWrapper.h > span.active {
-
-                background:#ddd;
-
-            }
         </style>
 
 	<ul data-simplevotemeid="<?php echo $id?>" class="gt_simplevoteme categorychecklist" style="text-transform: capitalize;display: none">
@@ -104,11 +26,11 @@ function gt_simplevoteme_draw_list_votes($votes,$id) {
 				if ($vote != 0) {
 					$user          = get_userdata($vote);
 					if (is_plugin_active('buddypress/bp-loader.php')) {
-						$users[ $key ][] = '<a href="' .get_home_url().'/members/'.  ( $user->user_nicename)
-						                   . '" target="_blank">' . get_avatar($user->ID,48). '<b>'.$user->display_name . '</b></a>';
+						$users[ $key ][] = '<div data-href="' .get_home_url().'/members/'.  ( $user->user_nicename)
+						                   . '">' . get_avatar($user->ID,48). '<b>'.$user->display_name . '</b></div>';
 					}else {
-						$users[ $key ][] = '<a href="' . get_author_posts_url( $vote,
-								$user->display_name ) . '" target="_blank">' . $user->display_name . '</a>';
+						$users[ $key ][] = '<div data-href="' . get_author_posts_url( $vote,
+								$user->display_name ) . '" target="_blank">' . $user->display_name . '</div>';
 					}
 
 				} else {
