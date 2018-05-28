@@ -43,7 +43,7 @@ function gt_simplevoteme_compliments_addvote()
 
 	$votes=gt_simplevoteme_insertvote($votes,$user_ID,$type);
 
-	update_compliment_updatemeta($compliment_ID, '_simplevotemevotes', $votes);
+	update_compliment_meta($compliment_ID, '_simplevotemevotes', $votes);
 
 	$noLinks=get_option('gt_simplevoteme_votes');
     $result = gt_simplevoteme_compliment_getvotelink($noLinks, $compliment_ID);
