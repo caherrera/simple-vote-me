@@ -340,6 +340,8 @@ function gt_simplevoteme_printvotelink_auto( $content ) {
 		}//nothing expected
 
 	} else if ( ( $auto == 1 || $auto == 3 ) && is_single() ) {//if is only post(1) or post&page(3)
+		if (!in_array(get_post_type(),get_option('gt_simplevoteme_custom_post_types'))) return $content;
+
 		if ( ! $position ) {
 			return $content . gt_simplevoteme_getvotelink();
 		} else if ( $position == 1 ) {
@@ -353,6 +355,8 @@ function gt_simplevoteme_printvotelink_auto( $content ) {
 		}//nothing expected
 
 	} else if ( ( $auto == 2 || $auto == 3 ) && is_page() ) {//if is only page(2) or post&page(3)
+		if (!in_array(get_post_type(),get_option('gt_simplevoteme_custom_post_types'))) return $content;
+
 		if ( ! $position ) {
 			return $content . gt_simplevoteme_getvotelink();
 		} else if ( $position == 1 ) {
