@@ -7,8 +7,8 @@ Contributors:
 Tags: vote, poll,smileys, count vote,good,bad,neutral,custom vote, recount, custom poll
 Version: 1.4.6.4
 Requires at least: 3.0
-Tested up to: 4.9.5
-Stable tag: 1.4.6.4
+Tested up to: 4.9.7
+Stable tag: 1.4.7
 Donate link:
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
