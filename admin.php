@@ -390,74 +390,66 @@ gt_simplevoteme_custom_columns();
 function gt_simplevoteme_extra_columns($columns)
 {
     $columns['simplevotemetotal']    = __('Votes');
-    $columns['simplevotemenegative'] = gt_simplevoteme_getimgvote('bad');
-    $columns['simplevotemeneutral']  = gt_simplevoteme_getimgvote('neutral');
-    $columns['simplevotemepositive'] = gt_simplevoteme_getimgvote('good');
-
+    foreach(gt_simplevoteme_get_list_evaluations() as $t=>$p) {
+	    $columns['simplevoteme' . $t] = gt_simplevoteme_getimgvote( $p['gt_simplevoteme_getimgvote'] );
+    }
     return $columns;
 }
 
+function gt_simplevoteme_get_list_evaluations() {
+	return get_option( 'gt_simplevoteme_votes_structure', [
+		'negatives' => [ 'gt_simplevoteme_getimgvote' => 'bad' ],
+		'neutrals'  => [ 'gt_simplevoteme_getimgvote' => 'neutral' ],
+		'positives' => [ 'gt_simplevoteme_getimgvote' => 'good' ],
+	] );
+}
 
-function gt_simplevoteme_content_column_row($column)
-{
-    global $post;
-    $post_id = $post->ID;
-    $votes   = get_post_meta($post_id, '_simplevotemevotes', true) != '' ? get_post_meta($post_id, '_simplevotemevotes',
-        true) : array(
-        'positives' => array(),
-        'negatives' => array(),
-        'neutrals'  => array(),
-    );
-    $users   = array('positives' => array(), 'negatives' => array(), 'neutrals' => array());
-    foreach ($votes as $key => $voteType) {
-        foreach ($voteType as $vote) {
-            if ($vote != 0) {
-                $user          = get_userdata($vote);
-                $users[$key][] = '<a href="' . get_author_posts_url($vote,
-                        $user->display_name) . '" target="_blank">' . $user->display_name . '</a>';
+function gt_simplevoteme_init_votes() {
+	$k=array_keys( gt_simplevoteme_get_list_evaluations() );
+	return array_combine( $k,array_fill(0,count($k),[]) );
+}
 
-            } else {
-                $users[$key][] = __('Anonymous');
-            }
-        }
-    }
-    echo '<div class="simplevoteme_admin_list">';
-    switch ($column):
-        case('simplevotemepositive'):
-            echo count($votes['positives']);
-            foreach ($users["positives"] as $user) {
-                echo "</br>" . $user;
-            }
-            break;
+function gt_simplevoteme_admin_list($votes) {
+	return count($votes) . '<br>'.implode('<br>',$votes);
+}
 
-        case('simplevotemenegative'):
-            echo count($votes['negatives']);
-            foreach ($users["negatives"] as $user) {
-                echo "</br>" . $user;
-            }
-            break;
-        case('simplevotemeneutral'):
-            echo count($votes['neutrals']);
-            foreach ($users["neutrals"] as $user) {
-                echo "</br>" . $user;
-            }
-            break;
-        case('simplevotemetotal'):
-            echo sizeof($votes, 1) - 3; //rest 3 because arrays for separate votes counts.
-            break;
+function gt_simplevoteme_get_post_meta( $post_id ) {
+	$votes = get_post_meta( $post_id, '_simplevotemevotes', true );
 
-        default:
-            break;
-    endswitch;
-    echo '</div>';
+	if ( ! is_array( $votes ) ) {
+		$votes = [];
+	}
+	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
+	$votes = array_map( function ( $voteType ) {
+		return array_map( 'gt_simplevoteme_get_userdata', $voteType );
+	}, $votes );
+
+	return $votes;
+}
+
+function gt_simplevoteme_content_column_row( $column ) {
+	if ( preg_match( '/^simplevoteme(.*)/', $column, $match ) ) {
+		global $post;
+		$post_id = $post->ID;
+        $votes = gt_simplevoteme_get_post_meta($post_id);
+
+
+
+		echo '<div class="simplevoteme_admin_list">';
+		if ( $column === 'simplevotemetotal' ) {
+			echo sizeof( $votes, 1 ) - 3; //rest 3 because arrays for separate votes counts.
+		} else {
+			echo gt_simplevoteme_admin_list( $votes[ $match[1] ] );
+		}
+		echo '</div>';
+	}
 }
 
 
 //Meta box for post
 function gt_simplevoteme_metabox_votes($post) {
 	wp_nonce_field( basename( __FILE__ ), "meta-box-nonce" );
-	$votes = get_post_meta( $post->ID, '_simplevotemevotes', true ) != '' ? get_post_meta( $post->ID,
-		'_simplevotemevotes', true ) : array( 'positives' => array(), 'negatives' => array(), 'neutrals' => array() );
+	$votes = gt_simplevoteme_get_post_meta($post->ID);
 	echo gt_simplevoteme_draw_list_votes($votes,$post->ID);
 }
 
@@ -479,6 +471,7 @@ add_action('admin_head', 'gt_simplevoteme_add_admin_head');
 
 function gt_simplevoteme_add_admin_head() {
 	echo '<style>
+    img.gt_simplevoteme_img,
     .wp-list-table img.gt_simplevoteme_custom_img_bad,
     .wp-list-table img.gt_simplevoteme_custom_img_neutral,
     .wp-list-table img.gt_simplevoteme_custom_img_good

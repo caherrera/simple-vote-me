@@ -6,57 +6,55 @@
  * Time: 11:20 AM
  */
 
+function gt_simplevoteme_get_userdata( $vote ) {
+	if ( $vote != 0 ) {
+		$user = get_userdata( $vote );
+		if ( is_admin() ) {
+			$user_url= get_edit_user_link( $vote ) ; //. '" target="_blank">' . $user->display_name . '</a>';
+            $map='<a href="%s" target="_blank">%s</a>';
+//            $display_name=$user->display_name;
+			$display_name = get_avatar( $user->ID, 48 ) . '<b>' . $user->display_name;
+		} else {
+			if ( is_plugin_active( 'buddypress/bp-loader.php' ) ) {
+//			$user_url = get_home_url() . '/members/' . ( $user->user_nicename );
+			$user_url = bp_core_get_userlink($vote,false,true);
+//			$user_name = '<div data-href="' . get_home_url() . '/members/' . ( $user->user_nicename )
+//			             . '">' . get_avatar( $user->ID, 48 ) . '<b>' . $user->display_name . '</b></div>';
+			} else {
+			$user_url= get_author_posts_url( $vote,$user->user_nicename ) ;
+//          $user_name = '<div data-href="' . get_author_posts_url( $vote,
+//					$user->user_nicename ) . '" target="_blank">' . $user->display_name . '</div>';
+			}
+			$display_name = get_avatar( $user->ID, 48 ) . '<b>' . $user->display_name;
+			$map='<div data-href="%s" target="_blank">%s</div>';
+		}
+		$user_name=sprintf($map,$user_url,$display_name);
+
+	} else {
+		$user_name = __( 'Anonymous' );
+	}
+
+	return $user_name;
+}
+
 function gt_simplevoteme_draw_list_votes($votes,$id) {
 
     ob_start();
 
 	?>
+    <ul data-simplevotemeid="<?php echo $id?>" class="gt_simplevoteme categorychecklist" style="text-transform: capitalize;display: none">
 
-        <style>
-
-        </style>
-
-	<ul data-simplevotemeid="<?php echo $id?>" class="gt_simplevoteme categorychecklist" style="text-transform: capitalize;display: none">
-		<?php
-
-
-		$users = array('positives' => array(), 'negatives' => array(), 'neutrals' => array());
-		foreach ($votes as $key => $voteType) {
-			foreach ($voteType as $vote) {
-				if ($vote != 0) {
-					$user          = get_userdata($vote);
-					if (is_plugin_active('buddypress/bp-loader.php')) {
-						$users[ $key ][] = '<div data-href="' .get_home_url().'/members/'.  ( $user->user_nicename)
-						                   . '">' . get_avatar($user->ID,48). '<b>'.$user->display_name . '</b></div>';
-					}else {
-						$users[ $key ][] = '<div data-href="' . get_author_posts_url( $vote,
-								$user->display_name ) . '" target="_blank">' . $user->display_name . '</div>';
-					}
-
-				} else {
-					$users[$key][] = __('Anonymous');
-				}
-			}
-		}
-		?>
 		<li><span>Total:</span><?php echo sizeof($votes, 1) - 3; ?></li>
 		<?php
-		gt_simplevoteme_draw_resume($key='positives',$users[$key]);
-		gt_simplevoteme_draw_resume($key='neutrals',$users[$key]);
-		gt_simplevoteme_draw_resume($key='negatives',$users[$key]);
-
+        foreach($votes as $key=>$voteKey) {
+	        gt_simplevoteme_draw_resume($key,$voteKey);
+        }
 		?>
 	</ul>
 	<?php
-	gt_simplevoteme_draw_votes($key='positives',$users[$key]);
-	gt_simplevoteme_draw_votes($key='neutrals',$users[$key]);
-	gt_simplevoteme_draw_votes($key='negatives',$users[$key]);
-
-	?>
-
-
-
-	<?php
+	foreach($votes as $key=>$voteKey) {
+		gt_simplevoteme_draw_votes($key,$voteKey);
+	}
 	$html=ob_get_clean();
 	return $html;
 }

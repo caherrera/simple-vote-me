@@ -157,9 +157,9 @@ add_action( 'wp_enqueue_scripts', 'gt_simplevoteme_enqueuescripts' );
 function gt_simplevoteme_getimgvote( $type ) {
 	$customImg = get_option( "gt_simplevoteme_custom_img_$type" );
 	if ( ! $customImg ) {
-		return "<img class=\"gt_simplevoteme_custom_img_$type\" src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
+		return "<img class=\"gt_simplevoteme_img gt_simplevoteme_custom_img gt_simplevoteme_custom_img_$type\" src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
 	} else {
-		return "<img src='$customImg' class=\"gt_simplevoteme_custom_img_$type\" />";
+		return "<img src='$customImg' class=\"gt_simplevoteme_img gt_simplevoteme_custom_img_$type\" />";
 	}
 }
 
