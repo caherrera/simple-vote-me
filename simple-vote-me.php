@@ -176,14 +176,7 @@ function gt_simplevoteme_getvotelink( $noLinks = false, $post_ID = false, $tipo 
 		}
 	}
 
-	$votes = get_post_meta( $post_ID, '_simplevotemevotes', true ) != "" ? get_post_meta( $post_ID,
-		'_simplevotemevotes',
-		true ) : array(
-		'positives' => array(),
-		//id users array
-		'negatives' => array(),
-		'neutrals'  => array(),
-	);
+	$votes = gt_simplevoteme_get_post_meta( $post_ID );
 	//if no limit votes per user or user not logged
 	if ( $limitVotesPerUser && $user_ID != 0 && ( in_array( $user_ID, $votes['positives'] ) || in_array( $user_ID,
 				$votes['negatives'] ) || in_array( $user_ID, $votes['neutrals'] ) ) ) {
@@ -340,7 +333,9 @@ function gt_simplevoteme_printvotelink_auto( $content ) {
 		}//nothing expected
 
 	} else if ( ( $auto == 1 || $auto == 3 ) && is_single() ) {//if is only post(1) or post&page(3)
-		if (!in_array(get_post_type(),get_option('gt_simplevoteme_custom_post_types'))) return $content;
+		if ( ! in_array( get_post_type(), get_option( 'gt_simplevoteme_custom_post_types' ) ) ) {
+			return $content;
+		}
 
 		if ( ! $position ) {
 			return $content . gt_simplevoteme_getvotelink();
@@ -355,7 +350,9 @@ function gt_simplevoteme_printvotelink_auto( $content ) {
 		}//nothing expected
 
 	} else if ( ( $auto == 2 || $auto == 3 ) && is_page() ) {//if is only page(2) or post&page(3)
-		if (!in_array(get_post_type(),get_option('gt_simplevoteme_custom_post_types'))) return $content;
+		if ( ! in_array( get_post_type(), get_option( 'gt_simplevoteme_custom_post_types' ) ) ) {
+			return $content;
+		}
 
 		if ( ! $position ) {
 			return $content . gt_simplevoteme_getvotelink();
@@ -443,7 +440,19 @@ function gt_simplevoteme_insertvote( $votes, $user_ID, $type ) {
 // creating Ajax call for WordPress
 add_action( 'wp_ajax_nopriv_simplevoteme_addvote', 'gt_simplevoteme_addvote' );
 add_action( 'wp_ajax_simplevoteme_addvote', 'gt_simplevoteme_addvote' );
-            
-            
 
+
+function gt_simplevoteme_get_post_meta( $post_id ) {
+	$votes = get_post_meta( $post_id, '_simplevotemevotes', true );
+
+	if ( ! is_array( $votes ) ) {
+		$votes = [];
+	}
+	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
+	$votes = array_map( function ( $voteType ) {
+		return array_map( 'gt_simplevoteme_get_userdata', $voteType );
+	}, $votes );
+
+	return $votes;
+}
   

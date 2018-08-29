@@ -1,0 +1,19 @@
+.gt_simplevoteme_table{}
+.gt_simplevoteme_table .to_remove{}
+.gt_simplevoteme_table .to_remove input{
+    text-decoration: line-through;
+}
+
+.gt_simplevoteme_table .to_remove a.gt_simplevoteme_vote_remove{
+    display: none;
+}
+.gt_simplevoteme_table .to_remove a.gt_simplevoteme_vote_undo_remove{
+    display: block;
+}
+
+.gt_simplevoteme_table a.gt_simplevoteme_vote_remove{
+    display: block;
+}
+.gt_simplevoteme_table a.gt_simplevoteme_vote_undo_remove{
+    display: none;
+}

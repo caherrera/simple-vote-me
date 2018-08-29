@@ -89,13 +89,16 @@
 #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list {
     display: none;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
 
 }
 
 #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li {
     clear: both;
-    /*float: left;*/
-    margin: 10px 0;
+    float: left;
+    margin: 0 0 4px;
+
     list-style: none;
 }
 
@@ -110,6 +113,9 @@
     float: left;
     height: 48px;
     line-height: 48px;
+}
+#gt_simplevoteme_votes ul.gt_simplevoteme_votes_list > li > a > b{
+
 }
 
 #gt_simplevoteme_votes ul.gt_simplevoteme_votes_list.active {
@@ -138,12 +144,12 @@
     font-weight: bold;
 }
 
-#gt_simplevoteme_votes ul.categorychecklist > li:first-child {
-    width: 100%;
-    margin-bottom: .5em;
-    padding-top: 0;
-    /*border: 0;*/
-}
+/*#gt_simplevoteme_votes ul.categorychecklist > li:first-child {*/
+    /*width: 100%;*/
+    /*margin-bottom: .5em;*/
+    /*padding-top: 0;*/
+    /*!*border: 0;*!*/
+/*}*/
 
 #gt_simplevoteme_votes ul.categorychecklist > li {
     padding: 15px 0px;

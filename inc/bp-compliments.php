@@ -38,7 +38,7 @@ function gt_simplevoteme_compliments_addvote()
     $compliment_ID = $_POST['complimentid'];
     $user_ID       = $_POST['userid'];
     $type          = $_POST['tipo'];
-    $votes         = get_compliment_votes($compliment_ID);
+    $votes         = gt_simplevoteme_get_compliment_votes($compliment_ID);
 
 
 	$votes=gt_simplevoteme_insertvote($votes,$user_ID,$type);
@@ -74,7 +74,7 @@ function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id
     }
 
 
-    $votes = get_compliment_votes($compliment_id);
+    $votes = gt_simplevoteme_get_compliment_votes($compliment_id);
     //if no limit votes per user or user not logged
     if ($limitVotesPerUser && $user_ID != 0 && (in_array($user_ID, $votes['positives']) || in_array($user_ID,
                 $votes['negatives']) || in_array($user_ID, $votes['neutrals']))) {
@@ -199,18 +199,18 @@ function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id
     return $result;
 }
 
-function get_compliment_votes($compliment_id = false)
+function gt_simplevoteme_get_compliment_votes($compliment_id = false)
 {
     $votes = get_compliment_meta($compliment_id, '_simplevotemevotes', true);
-    if ( ! $votes || ! $compliment_id) {
-        $votes = [
-            'positives' => [],
-            'negatives' => [],
-            'neutrals'  => [],
-        ];
-    }
+	if ( ! is_array( $votes ) ) {
+		$votes = [];
+	}
+	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
+	$votes = array_map( function ( $voteType ) {
+		return array_map( 'gt_simplevoteme_get_userdata', $voteType );
+	}, $votes );
 
-    return $votes;
+	return $votes;
 }
 
 function gt_simplevoteme_compliment_getimgvote($type)
