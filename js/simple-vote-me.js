@@ -1,35 +1,39 @@
 var simplevotemeaddvoteQueue = {};
 
 function simplevotemeShowLoading(o) {
-    o = jQuery(o);
-    o.find('img').attr('src', simplevotemeLoading);
-
+    var img =o.find('img');
+    img.data('src', img.attr('src'));
+    img.attr('src', simplevotemeLoading);
 
 }
 
-function simplevotemeaddvote(postId, tipo, userID, o) {
-    if (!simplevotemeaddvoteQueue.hasOwnProperty('p' + postId)) {
-        simplevotemeaddvoteQueue['p' + postId] = true;
+function simplevotemeaddvote(post_id, vote_selected, user_id, o) {
+    o = jQuery(o);
+
+    if (!simplevotemeaddvoteQueue.hasOwnProperty('p' + post_id)) {
+        simplevotemeaddvoteQueue['p' + post_id] = true;
         simplevotemeShowLoading(o);
 
-        return simplevotemeaddvoteajax(postId, {
+        return simplevotemeaddvoteajax(post_id, {
             action: 'simplevoteme_addvote',
-            tipo: tipo,
-            postid: postId,
-            userid: userID
+            vote_selected: vote_selected,
+            post_id: post_id,
+            user_id: user_id
         }, o);
     }
 }
 
-function simplevotemeaddvotecompliment(complimentid, tipo, userID, o) {
-    if (!simplevotemeaddvoteQueue.hasOwnProperty('c' + complimentid)) {
-        simplevotemeaddvoteQueue['c' + complimentid] = true;
+function simplevotemeaddvotecompliment(compliment_id, vote_selected, user_id, o) {
+    o = jQuery(o);
+
+    if (!simplevotemeaddvoteQueue.hasOwnProperty('c' + compliment_id)) {
+        simplevotemeaddvoteQueue['c' + compliment_id] = true;
         simplevotemeShowLoading(o);
-        return simplevotemeaddvoteajax(complimentid, {
+        return simplevotemeaddvoteajax(compliment_id, {
             action: 'simplevoteme_compliments_addvote',
-            tipo: tipo,
-            complimentid: complimentid,
-            userid: userID
+            vote_selected: vote_selected,
+            compliment_id: compliment_id,
+            user_id: user_id
         }, o);
     }
 }
@@ -42,26 +46,50 @@ function simplevotemeaddvoteajax(id, data, o) {
         success: function (result, textStatus, XMLHttpRequest) {
 
             var linkid = '#simplevoteme-' + id;
-            var c = jQuery("<div id=result9999>" + result + '</div>');
+            var simplevoteme = jQuery(linkid);
 
-            jQuery(linkid).find('#gt_simplevoteme_votes_positives').html(c.find('#gt_simplevoteme_votes_positives').html());
-            jQuery(linkid).find('#gt_simplevoteme_votes_neutrals').html(c.find('#gt_simplevoteme_votes_neutrals').html());
-            jQuery(linkid).find('#gt_simplevoteme_votes_negatives').html(c.find('#gt_simplevoteme_votes_negatives').html());
+            if (result.success) {
+                for(var option in result.data.votes) {
+                    if(result.data.votes.hasOwnProperty(option)) {
+                        var votes=result.data.votes[option];
+                        var ul=simplevoteme.find('#gt_simplevoteme_votes_'+option);
+                        ul.empty();
+                        var u=0;
+                        for(var user in votes) {
+                            if (votes.hasOwnProperty(user)) {
+                                var li=jQuery(document.createElement('li'));
+                                li.append(votes[user]);
+                                ul.append(li);
+                                u++;
+                            }
 
-            jQuery(linkid).find('.good span.result').html(c.find('.good span.result').html());
-            jQuery(linkid).find('.neutro span.result').html(c.find('.neutro span.result').html());
-            jQuery(linkid).find('.bad span.result').html(c.find('.bad span.result').html());
+                        }
+                        simplevoteme.find('#SimpleVoteMeVoteOption'+option).find('span.result').text(u);
+                    }
+                }
 
-            jQuery(linkid).find('.good img').attr('src', c.find('.good img').attr('src'));
-            jQuery(linkid).find('.neutro img').attr('src', c.find('.neutro img').attr('src'));
-            jQuery(linkid).find('.bad img').attr('src', c.find('.bad img').attr('src'));
+                // jQuery(linkid).find('#gt_simplevoteme_votes_positives').html(c.find('#gt_simplevoteme_votes_positives').html());
+                // jQuery(linkid).find('#gt_simplevoteme_votes_neutrals').html(c.find('#gt_simplevoteme_votes_neutrals').html());
+                // jQuery(linkid).find('#gt_simplevoteme_votes_negatives').html(c.find('#gt_simplevoteme_votes_negatives').html());
+                //
+                // jQuery(linkid).find('.good span.result').html(c.find('.good span.result').html());
+                // jQuery(linkid).find('.neutro span.result').html(c.find('.neutro span.result').html());
+                // jQuery(linkid).find('.bad span.result').html(c.find('.bad span.result').html());
+                //
+                // jQuery(linkid).find('.good img').attr('src', c.find('.good img').attr('src'));
+                // jQuery(linkid).find('.neutro img').attr('src', c.find('.neutro img').attr('src'));
+                // jQuery(linkid).find('.bad img').attr('src', c.find('.bad img').attr('src'));
 
-
-            if (data.hasOwnProperty('postid')) {
-                delete simplevotemeaddvoteQueue['p' + data.postid];
-            } else {
-                delete simplevotemeaddvoteQueue['c' + data.complimentid];
             }
+
+            if (data.hasOwnProperty('post_id')) {
+                delete simplevotemeaddvoteQueue['p' + data.post_id];
+            } else {
+                delete simplevotemeaddvoteQueue['c' + data.compliment_id];
+            }
+            var img=o.find('img');
+            img.attr('src',img.data('src'));
+
         },
         error: function (MLHttpRequest, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -163,8 +191,11 @@ function simplevotemeaddvoteajax(id, data, o) {
             var $this = $(this);
             var wrapper;
 
-            var options = $.extend({}, {}, params);
+            var options = $.extend({}, {
+                form: jQuery('#simplevoteme')
+            }, params);
             var countVotes = 0;
+            var form;
 
             function init() {
                 if ($this.hasClass('gt_simplevoteme_admin_structure'))
@@ -179,13 +210,13 @@ function simplevotemeaddvoteajax(id, data, o) {
 
                 $this.find('.gt_simplevoteme_vote_remove').click(function (e) {
                     e.preventDefault();
-                    var tr = jQuery('#'+$(this).data('vote'));
+                    var tr = jQuery('#' + $(this).data('vote'));
                     remove(tr);
                 });
 
                 $this.find('.gt_simplevoteme_vote_undo_remove').click(function (e) {
                     e.preventDefault();
-                    var tr = jQuery('#'+$(this).data('vote'));
+                    var tr = jQuery('#' + $(this).data('vote'));
                     cancelRemove(tr);
                 });
 
@@ -198,6 +229,16 @@ function simplevotemeaddvoteajax(id, data, o) {
                         image: $(this).parent().find('img')
                     });
                 });
+
+                form = jQuery(options.form);
+                form.submit(function (e) {
+                    e.preventDefault();
+                    wrapper.find('tr').each(function () {
+
+                    });
+                });
+
+
             }
 
 
@@ -209,7 +250,7 @@ function simplevotemeaddvoteajax(id, data, o) {
                 var $inputLabel = jQuery('<input name="gt_simplevoteme_vote[' + _this.countVotes + '][label]" id="GtSimplevotemeVote' + _this.countVotes + 'Label" value="">');
                 var removeButton = jQuery('<a href="#remove" id="GtSimplevotemeVoteRemove" class="gt_simplevoteme_vote_remove button button-link-delete"><span class="dashicons dashicons-trash"></span></a>');
 
-                removeButton.click(function(e){
+                removeButton.click(function (e) {
                     e.preventDefault();
                     var tr = $(this).parent().parent();
                     remove(tr);
@@ -217,7 +258,7 @@ function simplevotemeaddvoteajax(id, data, o) {
 
                 var undoRemoveButton = jQuery('<a href="#undo-remove" id="GtSimplevotemeVoteUndoRemove" class="gt_simplevoteme_vote_undo_remove button button-link-delete"><span class="dashicons dashicons-image-rotate"></span></a>');
 
-                undoRemoveButton.click(function(e){
+                undoRemoveButton.click(function (e) {
                     e.preventDefault();
                     var tr = $(this).parent().parent();
                     cancelRemove(tr);
@@ -278,7 +319,7 @@ function simplevotemeaddvoteajax(id, data, o) {
                 vote.addClass('to_remove');
                 vote.find('input[type=hidden].to_remove').val('1');
                 vote.find('.gt_simplevoteme_custom_img_link').hide();
-                vote.find('input').attr('disabled','disabled');
+                vote.find('input').attr('disabled', 'disabled');
 
 
             }

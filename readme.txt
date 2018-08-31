@@ -5,10 +5,10 @@ Author: Carlos Herrera
 Author URI: https://github.com/caherrera/simple-vote-me
 Contributors:
 Tags: vote, poll,smileys, count vote,good,bad,neutral,custom vote, recount, custom poll
-Version: 1.4.6.4
+Version: 2.0
 Requires at least: 3.0
 Tested up to: 4.9.7
-Stable tag: 1.4.7
+Stable tag: 2.0
 Donate link:
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,13 +18,14 @@ Integrate a simple voting plugin with smileys in your Wordpress!
 
 == Description ==
 
-This plugin allows you to set a votation for the post and pages. This votation has three options (good, neutral and bad).
+This plugin allows you to set a votation for the post and pages. This votation has three options (good, neutral and bad)
+by default, but you can add more.
 
 = Features =
 * Auto insert in content (it can be disabled).
 * Filter by post and page.
 * Total counts and vote percentages.
-* 3 Types of votes: Good, Neutral and Bad.
+* Many Types of votes: by default Good, Neutral and Bad.
 * See the votes on the admin panel.
 * Widget to insert wherever you want.
 * Widget to see the top rated post.
@@ -81,6 +82,10 @@ The plugin uses minimum CSS and inserts valid HTML when necessary.
 
 
 == Changelog ==
+= 2.0 =
+* Allow add and remove types of votes
+* hotfix: when you select auto insert make sure only appear in selected custom post types
+
 = 1.4.6.3 =
 * js issue
 

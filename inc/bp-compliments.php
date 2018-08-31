@@ -5,221 +5,92 @@
  * Date: 29/12/17
  * Time: 12:38 PM
  */
-define('BP_COMPLIMENT_META_TYPE', 'bp_compliments');
-function get_compliment_meta($compliment_id, $key = '', $single = false)
-{
-    return get_metadata(BP_COMPLIMENT_META_TYPE, $compliment_id, $key, $single);
+define( 'BP_COMPLIMENT_META_TYPE', 'bp_compliments' );
+function get_compliment_meta( $compliment_id, $key = '', $single = false ) {
+	return get_metadata( BP_COMPLIMENT_META_TYPE, $compliment_id, $key, $single );
 }
 
-function add_compliment_meta($compliment_id, $meta_key, $meta_value, $unique = false)
-{
-    $retval = add_metadata(BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $unique);
+function add_compliment_meta( $compliment_id, $meta_key, $meta_value, $unique = false ) {
+	$retval = add_metadata( BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $unique );
 
-    return $retval;
+	return $retval;
 }
 
-function metadata_compliment_exists($compliment_id, $meta_key, $meta_value, $unique = false)
-{
-    $retval = metadata_exists(BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $unique);
+function metadata_compliment_exists( $compliment_id, $meta_key, $meta_value, $unique = false ) {
+	$retval = metadata_exists( BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $unique );
 
-    return $retval;
+	return $retval;
 }
 
-function update_compliment_meta($compliment_id, $meta_key, $meta_value, $prev_value = '')
-{
-    return update_metadata(BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $prev_value);
+function update_compliment_meta( $compliment_id, $meta_key, $meta_value, $prev_value = '' ) {
+	return update_metadata( BP_COMPLIMENT_META_TYPE, $compliment_id, $meta_key, $meta_value, $prev_value );
 }
 
 /** Ajax **/
-function gt_simplevoteme_compliments_addvote()
-{
-    $results = '';
-    global $wpdb;
-    $compliment_ID = $_POST['complimentid'];
-    $user_ID       = $_POST['userid'];
-    $type          = $_POST['tipo'];
-    $votes         = gt_simplevoteme_get_compliment_votes($compliment_ID);
+function gt_simplevoteme_compliments_addvote() {
+
+	$compliment_ID = $_POST['compliment_id'];
+	$user_ID       = $_POST['user_id'];
+	$vote_selected = $_POST['vote_selected'];
+	$votes         = gt_simplevoteme_get_compliment_votes( $compliment_ID );
 
 
-	$votes=gt_simplevoteme_insertvote($votes,$user_ID,$type);
+	$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
 
-	update_compliment_meta($compliment_ID, '_simplevotemevotes', $votes);
-
-	$noLinks=get_option('gt_simplevoteme_votes');
-    $result = gt_simplevoteme_compliment_getvotelink($noLinks, $compliment_ID);
-
-
-    // Return the String
-    die($result);
+	if ( update_compliment_meta( $compliment_ID, '_simplevotemevotes', $votes )!==false ) {
+		gt_simplevoteme_send_json_success( $votes );
+	} else {
+		wp_send_json_error();
+	}
 }
 
 // creating Ajax call for WordPress
-add_action('wp_ajax_nopriv_simplevoteme_compliments_addvote', 'gt_simplevoteme_compliments_addvote');
-add_action('wp_ajax_simplevoteme_compliments_addvote', 'gt_simplevoteme_compliments_addvote');
+add_action( 'wp_ajax_nopriv_simplevoteme_compliments_addvote', 'gt_simplevoteme_compliments_addvote' );
+add_action( 'wp_ajax_simplevoteme_compliments_addvote', 'gt_simplevoteme_compliments_addvote' );
 
 
-function gt_simplevoteme_compliment_getvotelink($noLinks = false, $compliment_id = false, $tipo = 'h')
-{
-    $votemelink        = "";
-    $user_ID           = get_current_user_id();
-    $limitVotesPerUser = get_option('gt_simplevoteme_votes');
+function gt_simplevoteme_compliment_getvotelink( $noLinks = false, $compliment_id = false, $style = 'h' ) {
+	$vote_options = gt_simplevoteme_get_vote_options();
+	$user_ID      = get_current_user_id();
+
+	foreach ( $vote_options as $vote_option ) {
+		$vote_option->setType( 'compliment' );
+	}
+
+	if ( ! $compliment_id ) {
+		if ( isset( $_POST['compliment_id'] ) && filter_var( $_POST['compliment_id'], FILTER_VALIDATE_INT ) ) {
+			$compliment_id = $_POST['compliment_id'];
+		} else {
+			wp_die( 'must give compliment_id' );
+		}
+	}
 
 
-    if ( ! $compliment_id) {
-        if (isset($_POST['complimentid']) && filter_var($_POST['complimentid'], FILTER_VALIDATE_INT)) {
-            $compliment_id = $_POST['complimentid'];
-        } else {
-            wp_die('must give compliment_id');
-        }
-    }
+	$votes  = gt_simplevoteme_get_compliment_votes( $compliment_id,true );
+	$result = gt_simplevoteme_print_result( $noLinks, $votes, $vote_options, $user_ID, $compliment_id, $style );
 
-
-    $votes = gt_simplevoteme_get_compliment_votes($compliment_id);
-    //if no limit votes per user or user not logged
-    if ($limitVotesPerUser && $user_ID != 0 && (in_array($user_ID, $votes['positives']) || in_array($user_ID,
-                $votes['negatives']) || in_array($user_ID, $votes['neutrals']))) {
-        $noLinks = 1;
-    }//check if there are limit per user and the user is in array, if is $nolinks = 1
-
-    $votemePositive = count($votes['positives']);
-
-    $votemeNeutral = count($votes['neutrals']);
-
-    $votemeNegative = count($votes['negatives']);
-
-    $votemeTotal = sizeof($votes, 1) - 3; //rest 3 because arrays for separate votes counts.
-
-    $votemeResults     = get_option('gt_simplevoteme_results');
-    $votemeResultsType = get_option('gt_simplevoteme_results_type');
-    if ($votemeResults) {
-        if ($votemeResults == 1 || ($votemeResults == 2 && $noLinks)) {
-
-            if ($votemeTotal != 0 || $votemeTotal != '') {
-
-                if ($votemeNegative > 0) //if there are votes
-                {
-                    $percentNegative = round($votemeNegative / $votemeTotal, 2) * 100 . "%";
-                } else {
-                    $percentNegative = "0%";
-                }
-
-                if ($votemeResultsType == 2)//just total votes
-                {
-                    $votemePercentNegative = $votemeNegative;
-                } else if ($votemeResultsType == 1)//only percentages
-                {
-                    $votemePercentNegative = $percentNegative;
-                } else //all
-                {
-                    $votemePercentNegative = "$percentNegative<small> ($votemeNegative) </small>";
-                }
-
-
-                if ($votemeNeutral > 0) //if there are votes
-                {
-                    $percentNeutral = round($votemeNeutral / $votemeTotal, 2) * 100 . "%";
-                } else {
-                    $percentNeutral = "0%";
-                }
-
-                if ($votemeResultsType == 2)//just total votes
-                {
-                    $votemePercentNeutral = $votemeNeutral;
-                } else if ($votemeResultsType == 1)//only percentages
-                {
-                    $votemePercentNeutral = $percentNeutral;
-                } else //all
-                {
-                    $votemePercentNeutral = "$percentNeutral<small> ($votemeNeutral) </small>";
-                }
-
-
-                if ($votemePositive > 0) {
-                    $percentPositive = round($votemePositive / $votemeTotal, 2) * 100 . "%";
-                } else {
-                    $percentPositive = "0%";
-                }
-
-                if ($votemeResultsType == 2)//just total votes
-                {
-                    $votemePercentPositive = $votemePositive;
-                } else if ($votemeResultsType == 1)//only percentages
-                {
-                    $votemePercentPositive = $percentPositive;
-                } else //all
-                {
-                    $votemePercentPositive = "$percentPositive<small> ($votemePositive) </small>";
-                }
-
-
-            } else {
-                $votemePercentNegative = "";
-                $votemePercentNeutral  = "";
-                $votemePercentPositive = "";
-            }
-        } else {
-            $votemePercentNegative = "";
-            $votemePercentNeutral  = "";
-            $votemePercentPositive = "";
-        }
-
-    } else {
-
-        $votemePercentNegative = "";
-        $votemePercentNeutral  = "";
-        $votemePercentPositive = "";
-    }
-
-    if ( ! $noLinks) {
-
-        $linkPositivo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 1,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("good") . '</a>';
-        $linkNegativo = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 2,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("bad") . '</a>';
-        $linkNeutral  = '<a onclick="simplevotemeaddvotecompliment(' . $compliment_id . ', 0,' . $user_ID . ',this);">' . gt_simplevoteme_getimgvote("neutral") . '</a>';
-    } else {
-        $linkPositivo = gt_simplevoteme_compliment_getimgvote("good");
-        $linkNegativo = gt_simplevoteme_compliment_getimgvote("bad");
-        $linkNeutral  = gt_simplevoteme_compliment_getimgvote("neutral");
-    }
-
-    $title = get_option('gt_simplevoteme_title');
-
-    $votemelink = "<div class='simplevotemeWrapper $tipo' id='simplevoteme-$compliment_id' >$title";
-    $votemelink .= "<span class='good'>$linkPositivo <span class='result'>$votemePercentPositive</span></span>";
-    $votemelink .= "<span class='neutro'>$linkNeutral <span class='result'>$votemePercentNeutral</span></span>";
-    $votemelink .= "<span class='bad'>$linkNegativo <span class='result'>$votemePercentNegative</span></span>";
-    
-
-    $imgloading=SIMPLEVOTEMESURL.'/img/ajax_loader_red_32.gif';
-    $votemelink .= "</div><script type='text/javascript'>var simplevotemeLoading='$imgloading';</script>";
-
-//    $result = $votemelink;
-
-	$result = $votemelink . gt_simplevoteme_draw_list_votes( $votes, $compliment_id );
-
-    return $result;
+	return $result;
 }
 
-function gt_simplevoteme_get_compliment_votes($compliment_id = false)
-{
-    $votes = get_compliment_meta($compliment_id, '_simplevotemevotes', true);
+function gt_simplevoteme_get_compliment_votes( $compliment_id = false ) {
+	$votes = get_compliment_meta( $compliment_id, '_simplevotemevotes', true );
 	if ( ! is_array( $votes ) ) {
 		$votes = [];
 	}
 	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
-	$votes = array_map( function ( $voteType ) {
-		return array_map( 'gt_simplevoteme_get_userdata', $voteType );
-	}, $votes );
+
+	$votes = gt_simplevoteme_filter_userdata( $votes );
 
 	return $votes;
 }
 
-function gt_simplevoteme_compliment_getimgvote($type)
-{
-    $customImg = get_option("gt_simplevoteme_compliment_custom_img_$type");
 
-    if ( ! $customImg) {
-        return "<img src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
-    } else {
-        return "<img src='$customImg'/>";
-    }
+function gt_simplevoteme_compliment_getimgvote( $type ) {
+	$customImg = get_option( "gt_simplevoteme_compliment_custom_img_$type" );
+
+	if ( ! $customImg ) {
+		return "<img src='" . SIMPLEVOTEMESURL . "/img/$type.png'/>";
+	} else {
+		return "<img src='$customImg'/>";
+	}
 }

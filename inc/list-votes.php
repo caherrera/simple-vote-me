@@ -9,9 +9,10 @@
 function gt_simplevoteme_get_userdata( $vote ) {
 	if ( $vote != 0 ) {
 		$user = get_userdata( $vote );
-		if ( is_admin() ) {
+		if ( is_admin() && ! in_array( current_action(),
+				[ 'wp_ajax_simplevoteme_addvote', 'wp_ajax_simplevoteme_compliments_addvote' ] ) ) {
 			$user_url = get_edit_user_link( $vote ); //. '" target="_blank">' . $user->display_name . '</a>';
-			$map      = '<a href="%s" target="_blank">%s</a>';
+			$map      = '<a id="SimpleVoteMeUser%s" href="%s" target="_blank" data-id="%s">%s</a>';
 		} else {
 			if ( is_plugin_active( 'buddypress/bp-loader.php' ) ) {
 
@@ -19,10 +20,10 @@ function gt_simplevoteme_get_userdata( $vote ) {
 			} else {
 				$user_url = get_author_posts_url( $vote, $user->user_nicename );
 			}
-			$map = '<div data-href="%s" target="_blank">%s</div>';
+			$map = '<div id="SimpleVoteMeUser%s" data-href="%s" data-id="%s">%s</div>';
 		}
 		$display_name = get_avatar( $user->ID, 48 ) . '<b>' . $user->display_name . '</b>';
-		$user_name    = sprintf( $map, $user_url, $display_name );
+		$user_name    = sprintf( $map, $vote, $user_url, $vote, $display_name );
 
 	} else {
 		$user_name = __( 'Anonymous' );
@@ -66,8 +67,7 @@ function gt_simplevoteme_draw_votes( $key, $usersCat ) {
 
 function gt_simplevoteme_draw_resume( $key, $usersCat ) {
 	$countUsersCat = count( $usersCat );
-	$option        = gt_simplevoteme_get_vote_options( $key );
-	$imgvote       = gt_simplevoteme_getimgvote( $option['name'] );
+	$imgvote       = gt_simplevoteme_getimgvote( $key );
 	echo "<li data-key=\"$key\" class=\"gt_simplevoteme_resume_div\" >$imgvote $countUsersCat</li>";
 
 

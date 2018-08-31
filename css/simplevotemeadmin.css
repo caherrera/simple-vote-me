@@ -17,3 +17,16 @@
 .gt_simplevoteme_table a.gt_simplevoteme_vote_undo_remove{
     display: none;
 }
+
+img.gt_simplevoteme_img,
+.wp-list-table img.gt_simplevoteme_custom_img_bad,
+.wp-list-table img.gt_simplevoteme_custom_img_neutral,
+.wp-list-table img.gt_simplevoteme_custom_img_good
+{ width: 32px;   }
+
+div.simplevoteme_admin_list {
+    overflow: hidden;
+    width: 32px;
+    height: 23px;
+    line-height: 23px;
+}
