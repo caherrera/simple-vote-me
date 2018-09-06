@@ -292,16 +292,19 @@ function simplevotemeaddvoteajax(id, data, o) {
 
             this.addNew = function ($args = []) {
 
+                var tr = jQuery(document.createElement('tr'));
+                wrapper.prepend(tr);
+
                 var uuid=generateUUID();
                 var imgTagName = "gt_simplevoteme_custom_thumb_$name";
+                var $inputId = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][id]" id="GtSimplevotemeVote' + uuid + 'Id" value="Nuevo">');
                 var $inputName = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][name]" id="GtSimplevotemeVote' + uuid + 'Name" value="">');
                 var $inputLabel = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][label]" id="GtSimplevotemeVote' + uuid + 'Label" value="">');
                 var removeButton = jQuery('<a href="#remove" id="GtSimplevotemeVoteRemove" class="gt_simplevoteme_vote_remove button button-link-delete"><span class="dashicons dashicons-trash"></span></a>');
 
                 removeButton.click(function (e) {
                     e.preventDefault();
-                    var tr = $(this).parent().parent();
-                    remove(tr);
+                    tr.remove();
                 });
 
                 var undoRemoveButton = jQuery('<a href="#undo-remove" id="GtSimplevotemeVoteUndoRemove" class="gt_simplevoteme_vote_undo_remove button button-link-delete"><span class="dashicons dashicons-image-rotate"></span></a>');
@@ -311,9 +314,10 @@ function simplevotemeaddvoteajax(id, data, o) {
                     var tr = $(this).parent().parent();
                     cancelRemove(tr);
                 });
-                var tr = jQuery(document.createElement('tr'));
 
-                tr.append('<td>Nuevo</td>');
+
+
+                tr.append(jQuery(document.createElement('td')).append($inputId));
                 tr.append(jQuery(document.createElement('td')).append($inputName));
                 tr.append(jQuery(document.createElement('td')).append($inputLabel));
 
@@ -328,7 +332,6 @@ function simplevotemeaddvoteajax(id, data, o) {
 
                 tr.append(jQuery(document.createElement('td')).append(removeButton).append(undoRemoveButton));
 
-                wrapper.prepend(tr);
                 wpMediaUploader({selector: td, target: td, image: image});
 
 
