@@ -241,7 +241,8 @@ function gt_simplevoteme_get_post_meta( $post_id, $userdata = false ) {
 	if ( ! is_array( $votes ) ) {
 		$votes = [];
 	}
-	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
+	$votes = wp_parse_args( $votes, $init_votes=gt_simplevoteme_init_votes() );
+	$votes = array_intersect_key( $votes, $init_votes );
 	if ( $userdata ) {
 		$votes = array_map( function ( $voteType ) {
 			return array_map( 'gt_simplevoteme_get_userdata', $voteType );

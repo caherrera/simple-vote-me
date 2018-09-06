@@ -29,26 +29,33 @@ function gt_simplevoteme_getimgvote( $type ) {
  * @return VoteOption[]|VoteOption|null
  */
 function gt_simplevoteme_get_vote_options( $vote = null ) {
-	$option = get_option( 'gt_simplevoteme_votes_structure', [
-		'negatives' => new VoteOption( [
-			'id'         => 'negatives',
-			'label'      => 'Bad',
-			'name'       => 'bad',
-			'custom_img' => '/wp-content/uploads/simple-vote-me/bad.png'
-		] ),
-		'neutrals'  => new VoteOption( [
-			'id'         => 'neutrals',
-			'label'      => 'Neutral',
-			'name'       => 'neutral',
-			'custom_img' => '/wp-content/uploads/simple-vote-me/neutral.png'
-		] ),
-		'positives' => new VoteOption( [
-			'id'         => 'positives',
-			'label'      => 'Good',
-			'name'       => 'good',
-			'custom_img' => '/wp-content/uploads/simple-vote-me/good.png'
-		] ),
-	] );
+	try {
+		$option = get_option( 'gt_simplevoteme_options_votes', [
+			'negatives' => [
+				'id'         => 'negatives',
+				'label'      => 'Bad',
+				'name'       => 'bad',
+				'custom_img' => '/wp-content/uploads/simple-vote-me/bad.png'
+			],
+			'neutrals'  => [
+				'id'         => 'neutrals',
+				'label'      => 'Neutral',
+				'name'       => 'neutral',
+				'custom_img' => '/wp-content/uploads/simple-vote-me/neutral.png'
+			],
+			'positives' => [
+				'id'         => 'positives',
+				'label'      => 'Good',
+				'name'       => 'good',
+				'custom_img' => '/wp-content/uploads/simple-vote-me/good.png'
+			],
+		] );
+	}catch(Exception $e){
+		wp_die($e->getMessage());
+	}
+	$option = array_map( function ( $v ) {
+		return new VoteOption( $v );
+	}, $option );
 	if ( $vote ) {
 		return $option[ $vote ] ?: null;
 	} else {
@@ -83,6 +90,6 @@ function gt_simplevoteme_send_json_success( $votes ) {
 
 	$votes = gt_simplevoteme_filter_userdata( $votes );
 
-	wp_send_json_success( [ 'votes' => $votes, 'noLinks' => (bool)$noLinks ] );
+	wp_send_json_success( [ 'votes' => $votes, 'noLinks' => (bool) $noLinks ] );
 }
 

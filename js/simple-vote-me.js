@@ -67,19 +67,6 @@ function simplevotemeaddvoteajax(id, data, o) {
                         simplevoteme.find('#SimpleVoteMeVoteOption'+option).find('span.result').text(u);
                     }
                 }
-
-                // jQuery(linkid).find('#gt_simplevoteme_votes_positives').html(c.find('#gt_simplevoteme_votes_positives').html());
-                // jQuery(linkid).find('#gt_simplevoteme_votes_neutrals').html(c.find('#gt_simplevoteme_votes_neutrals').html());
-                // jQuery(linkid).find('#gt_simplevoteme_votes_negatives').html(c.find('#gt_simplevoteme_votes_negatives').html());
-                //
-                // jQuery(linkid).find('.good span.result').html(c.find('.good span.result').html());
-                // jQuery(linkid).find('.neutro span.result').html(c.find('.neutro span.result').html());
-                // jQuery(linkid).find('.bad span.result').html(c.find('.bad span.result').html());
-                //
-                // jQuery(linkid).find('.good img').attr('src', c.find('.good img').attr('src'));
-                // jQuery(linkid).find('.neutro img').attr('src', c.find('.neutro img').attr('src'));
-                // jQuery(linkid).find('.bad img').attr('src', c.find('.bad img').attr('src'));
-
             }
 
             if (data.hasOwnProperty('post_id')) {
@@ -211,7 +198,24 @@ function simplevotemeaddvoteajax(id, data, o) {
                 $this.find('.gt_simplevoteme_vote_remove').click(function (e) {
                     e.preventDefault();
                     var tr = jQuery('#' + $(this).data('vote'));
-                    remove(tr);
+                    confirmAction('Eliminar una opción de voto, borrará los votos realizados por los usuarios. Esta acción no puede deshacerse.','Eliminar Opción de Voto',[
+                        {
+                            'text':'Confirmar y eliminar opción de voto',
+                            'class':'button button-primary',
+                            click:function() {
+
+                                remove(tr);
+                                $( this ).dialog( "close" );
+                            }
+                        },
+                        {
+                            'text':'Cancel',
+                            click: function() {
+                                $( this ).dialog( "close" );
+                            }
+                        }
+                    ]);
+
                 });
 
                 $this.find('.gt_simplevoteme_vote_undo_remove').click(function (e) {
@@ -232,22 +236,66 @@ function simplevotemeaddvoteajax(id, data, o) {
 
                 form = jQuery(options.form);
                 form.submit(function (e) {
-                    e.preventDefault();
                     wrapper.find('tr').each(function () {
 
+                        $(this).find('input:not([type=hidden])').each(function() {
+                           if ($(this).val()=='') {
+                               $(this).addClass('error');
+                           }else{
+                               $(this).removeClass('error');
+                           }
+                        });
+
                     });
+                    if ($(this).find('input.error').length) {
+                        confirmAction('Debes completar todos los cambios','Opción de Votos',[
+                            {
+                                'text':'OK, Volver y reparar',
+                                'class':'button button-primary',
+                                click:function() {
+                                    $( this ).dialog( "close" );
+                                }
+                            },
+                        ]);
+                        e.preventDefault();
+                    }else{
+                        return true;
+                    }
                 });
 
 
             }
 
+            function confirmAction(message,title,buttons) {
+                var $d=jQuery('#dialog-confirm');
+                if (!$d.length) {
+                    $d=jQuery(document.createElement('div'));
+                }
+                $d.html(message);
+                $d.attr('title',title || 'Confirmar');
+                $d.dialog({
+                    resizable: false,
+                    height: "auto",
+                    width: 400,
+                    modal: true,
+                    buttons: buttons || {
+                        "Delete all items": function() {
+                            $( this ).dialog( "close" );
+                        },
+                        Cancel: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                });
+            }
+
 
             this.addNew = function ($args = []) {
 
-
+                var uuid=generateUUID();
                 var imgTagName = "gt_simplevoteme_custom_thumb_$name";
-                var $inputName = jQuery('<input name="gt_simplevoteme_vote[' + _this.countVotes + '][name]" id="GtSimplevotemeVote' + _this.countVotes + 'Name" value="">');
-                var $inputLabel = jQuery('<input name="gt_simplevoteme_vote[' + _this.countVotes + '][label]" id="GtSimplevotemeVote' + _this.countVotes + 'Label" value="">');
+                var $inputName = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][name]" id="GtSimplevotemeVote' + uuid + 'Name" value="">');
+                var $inputLabel = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][label]" id="GtSimplevotemeVote' + uuid + 'Label" value="">');
                 var removeButton = jQuery('<a href="#remove" id="GtSimplevotemeVoteRemove" class="gt_simplevoteme_vote_remove button button-link-delete"><span class="dashicons dashicons-trash"></span></a>');
 
                 removeButton.click(function (e) {
@@ -273,9 +321,9 @@ function simplevotemeaddvoteajax(id, data, o) {
                 var image = jQuery(document.createElement('img'));
                 image.css({width: '48px'});
 
-                td.addClass("gt_simplevoteme_custom_img_uploader").attr('id', 'GtSimpleVoteMeCustomImgUploader-' + generateUUID());
+                td.addClass("gt_simplevoteme_custom_img_uploader").attr('id', 'GtSimpleVoteMeCustomImgUploader-' + uuid);
                 td.append(image);
-                td.append('<input style="width: 70%" name="custom_img" class="gt_simplevoteme_custom_img_input"/>');
+                td.append('<input style="width: 70%" name="gt_simplevoteme_options_votes[' + uuid + '][custom_img]" class="gt_simplevoteme_custom_img_input"/>');
                 tr.append(td);
 
                 tr.append(jQuery(document.createElement('td')).append(removeButton).append(undoRemoveButton));

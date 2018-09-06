@@ -2,13 +2,17 @@
 
 function gt_simplevoteme_admin_scripts() {
 	wp_enqueue_media();
-	wp_enqueue_script( 'wp-media-uploader', SIMPLEVOTEMESURL . '/js/wp_media_uploader.js', array( 'jquery' ), 1.0 );
-	wp_enqueue_script( 'gtsimplevoteme', SIMPLEVOTEMESURL . '/js/simple-vote-me.js',
-		array( 'jquery', 'wp-media-uploader' ) );
+	wp_register_script( 'wp-media-uploader', SIMPLEVOTEMESURL . '/js/wp_media_uploader.js', array( 'jquery' ), 1.0 );
+	wp_register_script( 'gtsimplevoteme', SIMPLEVOTEMESURL . '/js/simple-vote-me.js',
+		array( 'jquery','jquery-ui-dialog', 'wp-media-uploader' ) );
 	wp_register_style( 'simplevotemestyle', SIMPLEVOTEMESURL . '/css/simplevoteme.css' );
 	wp_register_style( 'simplevotemestyleadmin', SIMPLEVOTEMESURL . '/css/simplevotemeadmin.css' );
 	wp_enqueue_style( 'simplevotemestyle' );
 	wp_enqueue_style( 'simplevotemestyleadmin' );
+	wp_enqueue_script( 'wp-media-uploader' );
+	wp_enqueue_script( 'gtsimplevoteme' );
+	wp_enqueue_script( 'gtsimplevotemeadmin' );
+	wp_enqueue_script('jquery-ui-dialog');
 
 }
 
@@ -53,16 +57,18 @@ function gt_simplevoteme_get_tr_custom_img( VoteOption $vote_option ) {
 	$title      = $id = $vote_option->id;
 	$customImg  = $vote_option->custom_img;
 	$name       = $vote_option->name;
-	$tagName    = "custom_img_$name";
 	$imgTagName = "gt_simplevoteme_custom_thumb_$name";
 
-	$inputName = sprintf( '<input name="gt_simplevoteme_vote[%s][name]" id="GtSimplevotemeVote%sName" value="%s">',
+	$inputId = sprintf( '<input name="gt_simplevoteme_options_votes[%s][id]" id="GtSimplevotemeVote%sId" type="hidden" value="%s">',
+		$id, ucwords( $id ), $vote_option->id );
+
+	$inputName = sprintf( '<input name="gt_simplevoteme_options_votes[%s][name]" id="GtSimplevotemeVote%sName" value="%s">',
 		$id, ucwords( $id ), $vote_option->name );
 
-	$inputRemove = sprintf( '<input type="hidden" name="gt_simplevoteme_vote[%s][to_remove]" class="to_remove" id="GtSimplevotemeVote%sToRemove" value="%s">',
+	$inputRemove = sprintf( '<input type="hidden" name="gt_simplevoteme_options_votes[%s][to_remove]" class="to_remove" id="GtSimplevotemeVote%sToRemove" value="%s">',
 		$id, ucwords( $id ), '' );
 
-	$inputLabel = sprintf( '<input name="gt_simplevoteme_vote[%s][label]" id="GtSimplevotemeVote%sLabel" value="%s">',
+	$inputLabel = sprintf( '<input name="gt_simplevoteme_options_votes[%s][label]" id="GtSimplevotemeVote%sLabel" value="%s">',
 		$id, ucwords( $id ), $vote_option->label );
 
 	$options = sprintf( '<a href="#remove" data-vote="GtSimplevotemeVote%s" id="GtSimplevotemeVote%s%s" class="gt_simplevoteme_vote_remove button button-link-delete">%s</a>',
@@ -73,17 +79,19 @@ function gt_simplevoteme_get_tr_custom_img( VoteOption $vote_option ) {
 		ucwords( $id ), ucwords( $id ), 'Remove',
 		'<span class="dashicons dashicons-image-rotate"></span>' );
 
+	$inputImage = sprintf( '<input name="gt_simplevoteme_options_votes[%s][custom_img]" id="GtSimplevotemeVote%sCustomImg" value="%s" class="gt_simplevoteme_custom_img_input">',
+		$id, ucwords( $id ), $vote_option->custom_img );
+
 
 	$html   = [];
 	$html[] = sprintf( '<tr id="GtSimplevotemeVote%s">', ucwords( $id ) );
-	$html[] = "<td>$title $inputRemove</td>";
+	$html[] = "<td>$title $inputRemove $inputId</td>";
 	$html[] = "<td>$inputName</td>";
 	$html[] = "<td>$inputLabel</td>";
 
 	$html[] = "<td class='gt_simplevoteme_custom_img_uploader'>";
 	$html[] = "<img id=\"$imgTagName\" style='width: 48px' src=\"$customImg\" class='gt_simplevoteme_custom_thumb'/>";
-	$html[] = "<input style='width: 70%' name=\"$tagName\" id=\"$tagName\" value=\"$customImg\" class=\"gt_simplevoteme_custom_img_input\"/>";
-//    $html[] = "<a href=\"#\" class=\"gt_simplevoteme_custom_img_link hide\" data-thumb=\"$imgTagName\" data-input=\"$tagName\">Upload</a>";
+	$html[] = $inputImage;
 	$html[] = "</td>";
 
 
@@ -102,7 +110,7 @@ function gt_simplevoteme_page_admin() {
 			unset( $_POST['gt_simplevoteme_reset'] );
 		}
 		foreach ( $_POST as $item => $value ) {
-			if ( preg_match( '/gt_simplevoteme_.*/', $item ) ) {
+		    if ( preg_match( '/gt_simplevoteme_.*/', $item ) ) {
 				update_option( $item, $value );
 			}
 		}
@@ -351,8 +359,11 @@ function gt_simplevoteme_page_admin() {
             </fieldset>
 			<?php submit_button(); ?>
         </form>
-		<?php wp_add_inline_script( 'gtsimplevoteme',
-			'jQuery(document).ready(function (e) {jQuery(\'#GtSimpleVoteMeStructure\').GtSimpleVotemeAdmin();});' ); ?>
+        <script>
+            jQuery(document).ready(function (e) {
+                jQuery('#GtSimpleVoteMeStructure').GtSimpleVotemeAdmin();
+            });
+        </script>
 
     </div>
 	<?php
@@ -373,6 +384,7 @@ function gt_simplevoteme_admin_options() {
 
 	register_setting( 'gt_simplevoteme_options', 'gt_simplevoteme_votes' );
 	register_setting( 'gt_simplevoteme_options', 'gt_simplevoteme_custom_post_types' );
+	register_setting( 'gt_simplevoteme_options', 'gt_simplevoteme_vote' );
 
 }
 
@@ -449,8 +461,7 @@ function gt_simplevoteme_metabox_votes( $post ) {
 	$votes = gt_simplevoteme_get_post_meta( $post->ID, true );
 	$total = sizeof( $votes, 1 ) - 3;
 
-	wp_add_inline_script( 'gtsimplevoteme',
-		"jQuery(document).ready(function () { $('#gt_simplevoteme_votes > h2').text('Votes ($total)');});" );
+	echo "<script>jQuery(document).ready(function () { $('#gt_simplevoteme_votes > h2').text('Votes ($total)');});</script>" ;
 	echo gt_simplevoteme_draw_list_votes( $votes, $post->ID );
 }
 
