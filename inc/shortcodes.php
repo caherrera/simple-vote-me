@@ -46,12 +46,12 @@ function gt_shortcode_simplevoteme_compliments($atributos)
     }
 
 
-//    $voteme = gt_simplevoteme_compliment_getvotelink(0, $atts['compliment_id'], $atts["type"]);
-//
-//    ob_start();
-//    echo $voteme;
-//
-//    return ob_get_clean();
+    $voteme = gt_simplevoteme_compliment_getvotelink(0, $atts['compliment_id'], $atts["type"]);
+
+    ob_start();
+    echo $voteme;
+
+    return ob_get_clean();
 
 }
 

@@ -251,6 +251,10 @@ add_action( 'wp_ajax_simplevoteme_addvote', 'gt_simplevoteme_addvote' );
 function gt_simplevoteme_get_post_meta( $post_id, $userdata = false ) {
 	$votes = get_post_meta( $post_id, '_simplevotemevotes', true );
 
+	return gt_simplevoteme_parse_post_meta($votes,$userdata);
+}
+
+function gt_simplevoteme_parse_post_meta($votes,$userdata=false) {
 	if ( ! is_array( $votes ) ) {
 		$votes = [];
 	}

@@ -72,16 +72,10 @@ function gt_simplevoteme_compliment_getvotelink( $noLinks = false, $compliment_i
 	return $result;
 }
 
-function gt_simplevoteme_get_compliment_votes( $compliment_id = false ) {
+function gt_simplevoteme_get_compliment_votes( $compliment_id, $userdata = false ) {
 	$votes = get_compliment_meta( $compliment_id, '_simplevotemevotes', true );
-	if ( ! is_array( $votes ) ) {
-		$votes = [];
-	}
-	$votes = wp_parse_args( $votes, gt_simplevoteme_init_votes() );
 
-	$votes = gt_simplevoteme_filter_userdata( $votes );
-
-	return $votes;
+	return gt_simplevoteme_parse_post_meta( $votes, $userdata );
 }
 
 
