@@ -44,22 +44,23 @@ function simplevotemeUpdateVotes(id, result, data, o) {
 
 
     if (result.success) {
-        for (var option in result.data.votes) {
-            if (result.data.votes.hasOwnProperty(option)) {
-                var votes = result.data.votes[option];
+        for (var option in result.data.votes_options) {
+            if (result.data.votes_options.hasOwnProperty(option)) {
+                var vote_option=result.data.votes_options[option];
+                var votes = vote_option.votes;
                 var ul = simplevoteme.find('#gt_simplevoteme_votes_' + option);
                 ul.empty();
-                var u = 0;
+
                 for (var user in votes) {
                     if (votes.hasOwnProperty(user)) {
                         var li = jQuery(document.createElement('li'));
                         li.append(votes[user]);
                         ul.append(li);
-                        u++;
+
                     }
 
                 }
-                simplevoteme.find('#SimpleVoteMeVoteOption' + option).find('span.result').text(u);
+                simplevoteme.find('#SimpleVoteMeVoteOption' + option).find('span.result').text(vote_option.result);
             }
         }
     }

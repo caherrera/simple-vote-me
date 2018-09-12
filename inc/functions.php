@@ -50,8 +50,8 @@ function gt_simplevoteme_get_vote_options( $vote = null ) {
 				'custom_img' => '/wp-content/uploads/simple-vote-me/good.png'
 			],
 		] );
-	}catch(Exception $e){
-		wp_die($e->getMessage());
+	} catch ( Exception $e ) {
+		wp_die( $e->getMessage() );
 	}
 	$option = array_map( function ( $v ) {
 		return new VoteOption( $v );
@@ -88,8 +88,16 @@ function gt_simplevoteme_insertvote( $votes, $user_ID, $type ) {
 function gt_simplevoteme_send_json_success( $votes ) {
 	$noLinks = get_option( 'gt_simplevoteme_votes' );
 
-	$votes = gt_simplevoteme_filter_userdata( $votes );
+	$votes         = gt_simplevoteme_filter_userdata( $votes );
+	$votes_options = gt_simplevoteme_load_votes( gt_simplevoteme_get_vote_options(), $votes, $noLinks );
+	$votes_options = array_map( function ( VoteOption $vote_option ) {
+		return $vote_option->toArray();
+	}, $votes_options );
 
-	wp_send_json_success( [ 'votes' => $votes, 'noLinks' => (bool) $noLinks ] );
+	wp_send_json_success( [
+		'votes'         => $votes,
+		'noLinks'       => (bool) $noLinks,
+		'votes_options' => $votes_options
+	] );
 }
 

@@ -37,8 +37,9 @@ function gt_simplevoteme_enqueuescripts() {
 
 
 	wp_localize_script( 'gtsimplevoteme', 'gtsimplevotemeajax', array(
-		'ajaxurl' => admin_url( 'admin-ajax.php' ),
-		'imgLoading'=>SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif'
+		'ajaxurl'     => admin_url( 'admin-ajax.php' ),
+		'imgLoading'  => SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif',
+		'resultsType' => get_option( 'gt_simplevoteme_results_type' )
 	) );
 
 	$css = get_option( 'gt_simplevoteme_custom_default_css' );
@@ -80,12 +81,12 @@ function gt_simplevoteme_getvotelink( $noLinks = false, $post_ID = false, $style
 	}
 
 	$votes  = gt_simplevoteme_get_post_meta( $post_ID, true );
-	$result = gt_simplevoteme_print_result( 'post',$noLinks, $votes, $vote_options, $user_ID, $post_ID, $style );
+	$result = gt_simplevoteme_print_result( 'post', $noLinks, $votes, $vote_options, $user_ID, $post_ID, $style );
 
 	return $result;
 }
 
-function gt_simplevoteme_print_result( $type,$noLinks, $votes, $vote_options, $user_ID, $ID, $style ) {
+function gt_simplevoteme_print_result( $type, $noLinks, $votes, $vote_options, $user_ID, $ID, $style ) {
 	$limitVotesPerUser = get_option( 'gt_simplevoteme_votes' );
 
 	if ( $limitVotesPerUser && gt_simplevoteme_check_previous_votes( $votes, $user_ID ) ) {
@@ -94,16 +95,24 @@ function gt_simplevoteme_print_result( $type,$noLinks, $votes, $vote_options, $u
 
 	$vote_options = gt_simplevoteme_load_votes( $vote_options, $votes, $noLinks );
 
-	$votemelink = gt_simplevoteme_links( $type,$vote_options, $style, $user_ID, $ID );
-//
+	$votemelink = gt_simplevoteme_links( $type, $vote_options, $style, $user_ID, $ID );
+//    return $votemelink ;
 	$result = $votemelink . gt_simplevoteme_draw_list_votes( $votes, $ID );
-//
+
 	return $result;
 }
 
+/**
+ * @param VoteOption[] $vote_options
+ * @param $votes
+ * @param $noLinks
+ *
+ * @return mixed
+ */
 function gt_simplevoteme_load_votes( $vote_options, $votes, $noLinks ) {
 	foreach ( $vote_options as $vote_option ) {
 		$vote_option->setVotes( $votes );
+		$vote_option->setResult();
 		$vote_option->setAllowLink( ! $noLinks );
 	}
 
@@ -118,18 +127,19 @@ function gt_simplevoteme_load_votes( $vote_options, $votes, $noLinks ) {
  *
  * @return string
  */
-function gt_simplevoteme_links( $type,$vote_options, $style, $user_id, $ID ) {
-	$title      = get_option( 'gt_simplevoteme_title' );
-	$votemelink = "<div class='simplevotemeWrapper $style' data-simplevotemetype='$type' data-simplevotemeid='$ID' id='simplevoteme-$ID' >$title";
+function gt_simplevoteme_links( $type, $vote_options, $style, $user_id, $ID ) {
+	$title         = get_option( 'gt_simplevoteme_title' );
+	$votemelink    = [];
+	$votemelink [] = "<div class='simplevotemeWrapper $style' data-simplevotemetype='$type' data-simplevotemeid='$ID' id='simplevoteme-$ID' >$title";
 	foreach ( $vote_options as $vote_option ) {
-		$votemelink .= sprintf( "<span class='%s' id='SimpleVoteMeVoteOption%s' data-key='%s'>%s<span class='result'>%s</span></span>",
+		$votemelink [] = sprintf( "<span class='%s' id='SimpleVoteMeVoteOption%s' data-key='%s'>%s<span class='result'><img src='%s' style='width: 12px;height: auto;'></span></span>",
 			$vote_option->name, $vote_option->id, $vote_option->id, $vote_option->getVoteLink( $ID, $user_id ),
-			$vote_option->getResult() );
+			SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif' );
 	}
+	$votemelink[] = '</div>';
 
 
-
-	return $votemelink;
+	return implode( '', $votemelink );
 }
 
 
@@ -225,7 +235,7 @@ function gt_simplevoteme_addvote() {
 	$votes         = gt_simplevoteme_get_post_meta( $post_ID );
 	if ( $user_ID && $vote_selected ) {
 		$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
-		if ( update_post_meta( $post_ID, '_simplevotemevotes', $votes ) === false ) {
+		if ( is_wp_error(update_post_meta( $post_ID, '_simplevotemevotes', $votes ) )) {
 			wp_send_json_error();
 		}
 	}

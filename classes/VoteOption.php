@@ -62,7 +62,8 @@ class VoteOption {
 	 */
 	public function getVoteLink( $ID, $user_ID ) {
 		$callback         = $this->getCallbackAddVote();
-		$this->_vote_link = sprintf( "<a onclick=\"%s('%s','%s','%s',this);\">%s</a>", $callback, $ID, $this->id, $user_ID,
+		$this->_vote_link = sprintf( "<a onclick=\"%s('%s','%s','%s',this);\">%s</a>", $callback, $ID, $this->id,
+			$user_ID,
 			$this->getImage() );
 
 		return $this->_vote_link;
@@ -90,8 +91,38 @@ class VoteOption {
 		return gt_simplevoteme_getimgvote( $this );
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getAllowLink() {
+		return $this->_allow_link;
+	}
+
+	/**
+	 * @param mixed $allow_link
+	 */
+	public function setAllowLink( $allow_link ): void {
+		$this->_allow_link = $allow_link;
+	}
+
+	public function toArray() {
+		// TODO: Implement __toString() method.
+		return ( array_merge( $this->row, [ 'result' => $this->getResult(), 'votes' => $this->getVotes() ] ) );
+	}
+
+
 	public function getResult() {
 		if ( ! $this->_result ) {
+			$this->setResult();
+		}
+
+		return $this->_result;
+	}
+
+	public function setResult( $result = null ) {
+		if ( $result ) {
+			$this->_result = $result;
+		} else {
 			$votemeResultsType = get_option( 'gt_simplevoteme_results_type' );
 			if ( $votemeResultsType == 2 )//just total votes
 			{
@@ -103,18 +134,7 @@ class VoteOption {
 			{
 				$this->_result = sprintf( "%s<small> (%s) </small>", $this->countVotes(), $this->percentVotes() );
 			}
-
 		}
-
-		return $this->_result;
-	}
-
-	public function setResult( $result ) {
-		$this->_result = $result;
-	}
-
-	public function countVotes() {
-		return count( $this->getVotes() );
 	}
 
 	/**
@@ -137,22 +157,12 @@ class VoteOption {
 
 	}
 
+	public function countVotes() {
+		return count( $this->getVotes() );
+	}
+
 	public function percentVotes() {
 		return ( round( $this->countVotes() / $this->totalVotes, 0 ) * 100 ) . '%';
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getAllowLink() {
-		return $this->_allow_link;
-	}
-
-	/**
-	 * @param mixed $allow_link
-	 */
-	public function setAllowLink( $allow_link ): void {
-		$this->_allow_link = $allow_link;
 	}
 
 }
