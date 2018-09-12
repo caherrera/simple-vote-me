@@ -36,7 +36,10 @@ function gt_simplevoteme_enqueuescripts() {
 	wp_enqueue_script( 'gtsimplevoteme', SIMPLEVOTEMESURL . '/js/simple-vote-me.js', array( 'jquery' ) );
 
 
-	wp_localize_script( 'gtsimplevoteme', 'gtsimplevotemeajax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+	wp_localize_script( 'gtsimplevoteme', 'gtsimplevotemeajax', array(
+		'ajaxurl' => admin_url( 'admin-ajax.php' ),
+		'imgLoading'=>SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif'
+	) );
 
 	$css = get_option( 'gt_simplevoteme_custom_default_css' );
 
@@ -77,12 +80,12 @@ function gt_simplevoteme_getvotelink( $noLinks = false, $post_ID = false, $style
 	}
 
 	$votes  = gt_simplevoteme_get_post_meta( $post_ID, true );
-	$result = gt_simplevoteme_print_result( $noLinks, $votes, $vote_options, $user_ID, $post_ID, $style );
+	$result = gt_simplevoteme_print_result( 'post',$noLinks, $votes, $vote_options, $user_ID, $post_ID, $style );
 
 	return $result;
 }
 
-function gt_simplevoteme_print_result( $noLinks, $votes, $vote_options, $user_ID, $ID, $style ) {
+function gt_simplevoteme_print_result( $type,$noLinks, $votes, $vote_options, $user_ID, $ID, $style ) {
 	$limitVotesPerUser = get_option( 'gt_simplevoteme_votes' );
 
 	if ( $limitVotesPerUser && gt_simplevoteme_check_previous_votes( $votes, $user_ID ) ) {
@@ -91,10 +94,10 @@ function gt_simplevoteme_print_result( $noLinks, $votes, $vote_options, $user_ID
 
 	$vote_options = gt_simplevoteme_load_votes( $vote_options, $votes, $noLinks );
 
-	$votemelink = gt_simplevoteme_links( $vote_options, $style, $user_ID, $ID );
-
+	$votemelink = gt_simplevoteme_links( $type,$vote_options, $style, $user_ID, $ID );
+//
 	$result = $votemelink . gt_simplevoteme_draw_list_votes( $votes, $ID );
-
+//
 	return $result;
 }
 
@@ -108,23 +111,23 @@ function gt_simplevoteme_load_votes( $vote_options, $votes, $noLinks ) {
 }
 
 /**
+ * @param string $type
  * @param VoteOption[] $vote_options
  * @param $style
  * @param $ID
  *
  * @return string
  */
-function gt_simplevoteme_links( $vote_options, $style, $user_id, $ID ) {
+function gt_simplevoteme_links( $type,$vote_options, $style, $user_id, $ID ) {
 	$title      = get_option( 'gt_simplevoteme_title' );
-	$votemelink = "<div class='simplevotemeWrapper $style' id='simplevoteme-$ID' >$title";
+	$votemelink = "<div class='simplevotemeWrapper $style' data-simplevotemetype='$type' data-simplevotemeid='$ID' id='simplevoteme-$ID' >$title";
 	foreach ( $vote_options as $vote_option ) {
 		$votemelink .= sprintf( "<span class='%s' id='SimpleVoteMeVoteOption%s' data-key='%s'>%s<span class='result'>%s</span></span>",
-			$vote_option->name, $vote_option->id,$vote_option->id, $vote_option->getVoteLink( $ID, $user_id ),
+			$vote_option->name, $vote_option->id, $vote_option->id, $vote_option->getVoteLink( $ID, $user_id ),
 			$vote_option->getResult() );
 	}
 
-	$imgloading = SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif';
-	$votemelink .= "</div><script type='text/javascript'>var simplevotemeLoading='$imgloading';</script>";
+
 
 	return $votemelink;
 }
@@ -220,13 +223,13 @@ function gt_simplevoteme_addvote() {
 	$user_ID       = $_POST['user_id'];
 	$vote_selected = $_POST['vote_selected'];
 	$votes         = gt_simplevoteme_get_post_meta( $post_ID );
-
-	$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
-	if ( update_post_meta( $post_ID, '_simplevotemevotes', $votes )!==false ) {
-		gt_simplevoteme_send_json_success( $votes );
-	} else {
-		wp_send_json_error();
+	if ( $user_ID && $vote_selected ) {
+		$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
+		if ( update_post_meta( $post_ID, '_simplevotemevotes', $votes ) === false ) {
+			wp_send_json_error();
+		}
 	}
+	gt_simplevoteme_send_json_success( $votes );
 }
 
 
@@ -241,7 +244,7 @@ function gt_simplevoteme_get_post_meta( $post_id, $userdata = false ) {
 	if ( ! is_array( $votes ) ) {
 		$votes = [];
 	}
-	$votes = wp_parse_args( $votes, $init_votes=gt_simplevoteme_init_votes() );
+	$votes = wp_parse_args( $votes, $init_votes = gt_simplevoteme_init_votes() );
 	$votes = array_intersect_key( $votes, $init_votes );
 	if ( $userdata ) {
 		$votes = array_map( function ( $voteType ) {

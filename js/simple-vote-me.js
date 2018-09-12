@@ -1,9 +1,9 @@
 var simplevotemeaddvoteQueue = {};
 
 function simplevotemeShowLoading(o) {
-    var img =o.find('img');
+    var img = o.find('img');
     img.data('src', img.attr('src'));
-    img.attr('src', simplevotemeLoading);
+    img.attr('src', gtsimplevotemeajax.imgLoading);
 
 }
 
@@ -38,45 +38,53 @@ function simplevotemeaddvotecompliment(compliment_id, vote_selected, user_id, o)
     }
 }
 
+function simplevotemeUpdateVotes(id, result, data, o) {
+    var linkid = '#simplevoteme-' + id;
+    var simplevoteme = jQuery(linkid);
+
+
+    if (result.success) {
+        for (var option in result.data.votes) {
+            if (result.data.votes.hasOwnProperty(option)) {
+                var votes = result.data.votes[option];
+                var ul = simplevoteme.find('#gt_simplevoteme_votes_' + option);
+                ul.empty();
+                var u = 0;
+                for (var user in votes) {
+                    if (votes.hasOwnProperty(user)) {
+                        var li = jQuery(document.createElement('li'));
+                        li.append(votes[user]);
+                        ul.append(li);
+                        u++;
+                    }
+
+                }
+                simplevoteme.find('#SimpleVoteMeVoteOption' + option).find('span.result').text(u);
+            }
+        }
+    }
+
+    if (data) {
+        if (data.hasOwnProperty('post_id')) {
+            delete simplevotemeaddvoteQueue['p' + data.post_id];
+        } else {
+            delete simplevotemeaddvoteQueue['c' + data.compliment_id];
+        }
+    }
+    if (o) {
+        var img = o.find('img');
+        img.attr('src', img.data('src'));
+    }
+}
+
+
 function simplevotemeaddvoteajax(id, data, o) {
     jQuery.ajax({
         type: 'POST',
         url: gtsimplevotemeajax.ajaxurl,
         data: data,
         success: function (result, textStatus, XMLHttpRequest) {
-
-            var linkid = '#simplevoteme-' + id;
-            var simplevoteme = jQuery(linkid);
-
-            if (result.success) {
-                for(var option in result.data.votes) {
-                    if(result.data.votes.hasOwnProperty(option)) {
-                        var votes=result.data.votes[option];
-                        var ul=simplevoteme.find('#gt_simplevoteme_votes_'+option);
-                        ul.empty();
-                        var u=0;
-                        for(var user in votes) {
-                            if (votes.hasOwnProperty(user)) {
-                                var li=jQuery(document.createElement('li'));
-                                li.append(votes[user]);
-                                ul.append(li);
-                                u++;
-                            }
-
-                        }
-                        simplevoteme.find('#SimpleVoteMeVoteOption'+option).find('span.result').text(u);
-                    }
-                }
-            }
-
-            if (data.hasOwnProperty('post_id')) {
-                delete simplevotemeaddvoteQueue['p' + data.post_id];
-            } else {
-                delete simplevotemeaddvoteQueue['c' + data.compliment_id];
-            }
-            var img=o.find('img');
-            img.attr('src',img.data('src'));
-
+            simplevotemeUpdateVotes(id, result, data, o);
         },
         error: function (MLHttpRequest, textStatus, errorThrown) {
             console.log(errorThrown);
@@ -107,6 +115,14 @@ function simplevotemeaddvoteajax(id, data, o) {
             options.wrapperList = $(this).find('#gt_simplevoteme_votes');
 
             var wrapper = jQuery(this);
+            var data;
+            if (wrapper.data('simplevotemetype') == 'post') {
+                data = {action: 'simplevoteme_addvote', post_id: wrapper.data('simplevotemeid')};
+            } else {
+                data = {action: 'simplevoteme_compliments_addvote', compliment_id: wrapper.data('simplevotemeid')};
+            }
+            simplevotemeaddvoteajax(wrapper.data('simplevotemeid'), data);
+
 
 
             wrapper.find(options.buttons).mouseover(function () {
@@ -198,20 +214,20 @@ function simplevotemeaddvoteajax(id, data, o) {
                 $this.find('.gt_simplevoteme_vote_remove').click(function (e) {
                     e.preventDefault();
                     var tr = jQuery('#' + $(this).data('vote'));
-                    confirmAction('Eliminar una opción de voto, borrará los votos realizados por los usuarios. Esta acción no puede deshacerse.','Eliminar Opción de Voto',[
+                    confirmAction('Eliminar una opción de voto, borrará los votos realizados por los usuarios. Esta acción no puede deshacerse.', 'Eliminar Opción de Voto', [
                         {
-                            'text':'Confirmar y eliminar opción de voto',
-                            'class':'button button-primary',
-                            click:function() {
+                            'text': 'Confirmar y eliminar opción de voto',
+                            'class': 'button button-primary',
+                            click: function () {
 
                                 remove(tr);
-                                $( this ).dialog( "close" );
+                                $(this).dialog("close");
                             }
                         },
                         {
-                            'text':'Cancel',
-                            click: function() {
-                                $( this ).dialog( "close" );
+                            'text': 'Cancel',
+                            click: function () {
+                                $(this).dialog("close");
                             }
                         }
                     ]);
@@ -238,27 +254,27 @@ function simplevotemeaddvoteajax(id, data, o) {
                 form.submit(function (e) {
                     wrapper.find('tr').each(function () {
 
-                        $(this).find('input:not([type=hidden])').each(function() {
-                           if ($(this).val()=='') {
-                               $(this).addClass('error');
-                           }else{
-                               $(this).removeClass('error');
-                           }
+                        $(this).find('input:not([type=hidden])').each(function () {
+                            if ($(this).val() == '') {
+                                $(this).addClass('error');
+                            } else {
+                                $(this).removeClass('error');
+                            }
                         });
 
                     });
                     if ($(this).find('input.error').length) {
-                        confirmAction('Debes completar todos los cambios','Opción de Votos',[
+                        confirmAction('Debes completar todos los cambios', 'Opción de Votos', [
                             {
-                                'text':'OK, Volver y reparar',
-                                'class':'button button-primary',
-                                click:function() {
-                                    $( this ).dialog( "close" );
+                                'text': 'OK, Volver y reparar',
+                                'class': 'button button-primary',
+                                click: function () {
+                                    $(this).dialog("close");
                                 }
                             },
                         ]);
                         e.preventDefault();
-                    }else{
+                    } else {
                         return true;
                     }
                 });
@@ -266,24 +282,24 @@ function simplevotemeaddvoteajax(id, data, o) {
 
             }
 
-            function confirmAction(message,title,buttons) {
-                var $d=jQuery('#dialog-confirm');
+            function confirmAction(message, title, buttons) {
+                var $d = jQuery('#dialog-confirm');
                 if (!$d.length) {
-                    $d=jQuery(document.createElement('div'));
+                    $d = jQuery(document.createElement('div'));
                 }
                 $d.html(message);
-                $d.attr('title',title || 'Confirmar');
+                $d.attr('title', title || 'Confirmar');
                 $d.dialog({
                     resizable: false,
                     height: "auto",
                     width: 400,
                     modal: true,
                     buttons: buttons || {
-                        "Delete all items": function() {
-                            $( this ).dialog( "close" );
+                        "Delete all items": function () {
+                            $(this).dialog("close");
                         },
-                        Cancel: function() {
-                            $( this ).dialog( "close" );
+                        Cancel: function () {
+                            $(this).dialog("close");
                         }
                     }
                 });
@@ -295,7 +311,7 @@ function simplevotemeaddvoteajax(id, data, o) {
                 var tr = jQuery(document.createElement('tr'));
                 wrapper.prepend(tr);
 
-                var uuid=generateUUID();
+                var uuid = generateUUID();
                 var imgTagName = "gt_simplevoteme_custom_thumb_$name";
                 var $inputId = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][id]" id="GtSimplevotemeVote' + uuid + 'Id" value="Nuevo">');
                 var $inputName = jQuery('<input name="gt_simplevoteme_options_votes[' + uuid + '][name]" id="GtSimplevotemeVote' + uuid + 'Name" value="">');
@@ -314,7 +330,6 @@ function simplevotemeaddvoteajax(id, data, o) {
                     var tr = $(this).parent().parent();
                     cancelRemove(tr);
                 });
-
 
 
                 tr.append(jQuery(document.createElement('td')).append($inputId));

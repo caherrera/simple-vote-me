@@ -58,9 +58,9 @@ function gt_simplevoteme_draw_list_votes( $votes, $id ) {
 
 function gt_simplevoteme_draw_votes( $key, $usersCat ) {
 	echo "<ul id='gt_simplevoteme_votes_$key' class='children gt_simplevoteme_votes_list' style='display: none;'>";
-	foreach ( $usersCat as $usr ) {
-		echo "<li>$usr</li>";
-	}
+//	foreach ( $usersCat as $usr ) {
+//		echo "<li>$usr</li>";
+//	}
 
 	echo "</ul>";
 }

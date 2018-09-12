@@ -34,14 +34,13 @@ function gt_simplevoteme_compliments_addvote() {
 	$vote_selected = $_POST['vote_selected'];
 	$votes         = gt_simplevoteme_get_compliment_votes( $compliment_ID );
 
-
-	$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
-
-	if ( update_compliment_meta( $compliment_ID, '_simplevotemevotes', $votes )!==false ) {
-		gt_simplevoteme_send_json_success( $votes );
-	} else {
-		wp_send_json_error();
+	if ( $user_ID && $vote_selected ) {
+		$votes = gt_simplevoteme_insertvote( $votes, $user_ID, $vote_selected );
+		if ( update_compliment_meta( $compliment_ID, '_simplevotemevotes', $votes ) === false ) {
+			wp_send_json_error();
+		}
 	}
+	gt_simplevoteme_send_json_success( $votes );
 }
 
 // creating Ajax call for WordPress
@@ -66,8 +65,8 @@ function gt_simplevoteme_compliment_getvotelink( $noLinks = false, $compliment_i
 	}
 
 
-	$votes  = gt_simplevoteme_get_compliment_votes( $compliment_id,true );
-	$result = gt_simplevoteme_print_result( $noLinks, $votes, $vote_options, $user_ID, $compliment_id, $style );
+	$votes  = gt_simplevoteme_get_compliment_votes( $compliment_id, true );
+	$result = gt_simplevoteme_print_result( 'compliment',$noLinks, $votes, $vote_options, $user_ID, $compliment_id, $style );
 
 	return $result;
 }
