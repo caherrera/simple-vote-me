@@ -5,6 +5,11 @@ function gt_simplevoteme_admin_scripts() {
 	wp_register_script( 'wp-media-uploader', SIMPLEVOTEMESURL . '/js/wp_media_uploader.js', array( 'jquery' ), 1.0 );
 	wp_register_script( 'gtsimplevoteme', SIMPLEVOTEMESURL . '/js/simple-vote-me.js',
 		array( 'jquery','jquery-ui-dialog', 'wp-media-uploader' ) );
+	wp_localize_script( 'gtsimplevoteme', 'gtsimplevotemeajax', array(
+		'ajaxurl'     => admin_url( 'admin-ajax.php' ),
+		'imgLoading'  => SIMPLEVOTEMESURL . '/img/ajax_loader_red_32.gif',
+		'resultsType' => get_option( 'gt_simplevoteme_results_type' )
+	) );
 	wp_register_style( 'simplevotemestyle', SIMPLEVOTEMESURL . '/css/simplevoteme.css' );
 	wp_register_style( 'simplevotemestyleadmin', SIMPLEVOTEMESURL . '/css/simplevotemeadmin.css' );
 	wp_enqueue_style( 'simplevotemestyle' );
@@ -13,6 +18,7 @@ function gt_simplevoteme_admin_scripts() {
 	wp_enqueue_script( 'gtsimplevoteme' );
 	wp_enqueue_script( 'gtsimplevotemeadmin' );
 	wp_enqueue_script('jquery-ui-dialog');
+
 
 }
 
