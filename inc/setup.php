@@ -29,7 +29,7 @@ function gt_simplevoteme_checkversion() {
 		//update tables,vars etc.
 	}
 	gt_simplevoteme_check_old_votes();
-	gt_simplevoteme_check_bp_compliments_activate();
+//	gt_simplevoteme_check_bp_compliments_activate();
 
 	update_option( 'gt_simplevoteme_version', $gt_simplevoteme_version );
 
